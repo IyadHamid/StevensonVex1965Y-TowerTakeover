@@ -1,64 +1,61 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/*    Module:       main.cpp                                                  */
+/*    Module:       display.cpp                                               */
 /*    Author:       Stevenson 1965Y (Iyad H)                                  */
 /*    Created:      4 Aug 2019                                                */
-/*    Description:  V5 project                                                */
+/*    Description:  Function functionality for display.h                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include <list>
 #include "vex.h"
+#include "display.h"
 
 using namespace std;
 using namespace vex;
 
-class notifier {
-  public:
-    notifier(controller::lcd lcd);
-    ~notifier();
-
-    void startNotifications();
-    void stopNotifications();
-
-    bool hasNotification(string nf);
-    void addNotification(string nf);
-    void removeNotification(string nf);
-    void clearNotification();
-
-  private:
-    void shiftNotifications(int skip = 0);
-
-    controller::lcd lcd;
-
-    static const int nfsSize = 10;
-    string nfs[nfsSize]; //nfs = notifications
-    int nfsSlot = 0;
-    bool running = false;
-};
-
-notifier::notifier(controller::lcd newlcd) {
-  lcd = newlcd;
+/*
+*@brief initalize notifier object
+*@return none
+*@param controller lcd, screen to use
+*/
+notifier::notifier(controller::lcd nlcd): lcd (nlcd) {
 }
 
+/*
+*@brief Starts marquee scroll text of all present notifications
+*@return none
+*@param none
+*/
 void notifier::startNotifications() {
   running = true;
   string notifications;
 
   for (const string& inf: nfs) {
-    notifications += " | " + inf;
+    if (inf != "") notifications += " | " + inf;
   }
-  notifications += " | ";
   while (running) {
+    lcd.clearLine(3);
     lcd.setCursor(3,0);
-    lcd.print(notifications);
+    lcd.print(notifications.c_str());
     notifications = notifications.substr(1) + notifications[0]; //Place first character in the end
-    this_thread::sleep_for(300);
+    this_thread::sleep_for(200);
   }
 }
 
+/*
+*@brief Stops text scroll
+*@return none
+*@param none
+*/
 void notifier::stopNotifications() {
   running = false;
 }
 
+/*
+*@brief Is the notification already there
+*@return boolean, found or not
+*@param string, notification
+*/
 bool notifier::hasNotification(string nf) {
   for (const string& inf: nfs) {
     if (nf == inf) {
@@ -68,7 +65,13 @@ bool notifier::hasNotification(string nf) {
   return false;
 }
 
+/*
+*@brief Adds notification to list
+*@return none
+*@param string, notification
+*/
 void notifier::addNotification(string nf) {
+  if (hasNotification(nf)) return;
   if (nfsSlot >= nfsSize) {
     shiftNotifications();
   }
@@ -78,7 +81,13 @@ void notifier::addNotification(string nf) {
   nfs[nfsSlot - 1] = nf;
 }
 
+/*
+*@brief Removes notification from list
+*@return none
+*@param string, notification
+*/
 void notifier::removeNotification(string nf) {
+  if (!hasNotification(nf)) return;
   for (int i = 0; i < nfsSize; i++) {
     if (nf == nfs[i]) {
       shiftNotifications(i);
@@ -87,10 +96,20 @@ void notifier::removeNotification(string nf) {
   }
 }
 
+/*
+*@brief Clear notifcation list
+*@return none
+*@param none
+*/
 void notifier::clearNotification() {
   fill_n(nfs, nfsSize, "");
 }
 
+/*
+*@brief Shifts elements to the left except for one
+*@return none
+*@param int, index to remove
+*/
 void notifier::shiftNotifications(int skip) {
   for (int i = skip; i < nfsSize - 1; i++) {
     nfs[i] = nfs[i + 1];

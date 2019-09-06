@@ -1,9 +1,9 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/*    Module:       main.cpp                                                  */
+/*    Module:       components.h                                              */
 /*    Author:       Stevenson 1965Y (Iyad H)                                  */
 /*    Created:      4 Aug 2019                                                */
-/*    Description:  V5 project                                                */
+/*    Description:  Initalize Components                                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 using namespace vex;
