@@ -1,19 +1,17 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
-/*    Module:       components.h                                              */
+/*    Module:       common.h                                                  */
 /*    Author:       Stevenson 1965Y (Iyad H)                                  */
-/*    Created:      4 Aug 2019                                                */
-/*    Description:  Initalize Components                                      */
+/*    Created:      6 Aug 2019                                                */
+/*    Description:  Common C++ Functionality                                  */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include "vex.h"
+#include <sstream>
 
-using namespace vex;
-
-brain Brain;
-
-// motor name = motor( port, reversed? );
-controller Controller1 = controller();
-controller Controller2 = controller();
+template <typename T> std::string to_string(const T &n) {
+  std::ostringstream stm;
+  stm << n;
+  return stm.str();
+}

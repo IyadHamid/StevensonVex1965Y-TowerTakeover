@@ -6,33 +6,37 @@
 /*    Description:  Display class defintion                                   */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-#include "vex.h"
 #pragma once
+
+#include "vex.h"
+#include <vector>
+
 
 using namespace std;
 using namespace vex;
 
-//Notification handler
+// Notification handler
 class notifier {
-  public:
-    notifier(controller::lcd lcd);
-    ~notifier();
+public:
+  notifier(controller::lcd nlcd);
+  notifier(vector<controller::lcd> nlcd);
+  ~notifier();
 
-    void startNotifications();
-    void stopNotifications();
+  void startNotifications();
+  void stopNotifications();
 
-    bool hasNotification(string nf);
-    void addNotification(string nf);
-    void removeNotification(string nf);
-    void clearNotification();
+  bool hasNotification(string nf);
+  void addNotification(string nf);
+  void removeNotification(string nf);
+  void clearNotification();
 
-  private:
-    void shiftNotifications(int skip = 0);
+private:
+  void shiftNotifications(int skip = 0);
 
-    controller::lcd lcd;
+  vector<controller::lcd> lcd;
 
-    static const int nfsSize = 10;
-    string nfs[nfsSize]; //nfs = notifications
-    int nfsSlot = 0;
-    bool running = false;
+  static const int nfsSize = 10;
+  string nfs[nfsSize]; // nfs = notifications
+  int nfsSlot = 0;
+  bool running = false;
 };
