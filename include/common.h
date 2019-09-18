@@ -10,8 +10,15 @@
 
 #include <sstream>
 
-template <typename T> std::string to_string(const T &n) {
-  std::ostringstream stm;
+using namespace std;
+
+/*
+ *@brief turns everything into a string
+ *@return string from input
+ *@param T anything
+ */
+template <typename T> string to_string(const T &n) {
+  ostringstream stm;
   stm << n;
   return stm.str();
 }

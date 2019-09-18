@@ -8,6 +8,7 @@
 /*----------------------------------------------------------------------------*/
 #include "common.h"
 #include "components.h"
+#include "controls.h"
 #include "display.h"
 #include "vex.h"
 
@@ -17,24 +18,40 @@ using namespace vex;
 // A global instance of competition
 competition Competition;
 
+controller Controller1 = controller(controllerType::primary);
+controller Controller2 = controller(controllerType::partner);
+
+motor frontLeft        = motor(PORT1, true);
+motor backLeft         = motor(PORT2, true);
+motor frontRight       = motor(PORT10);
+motor backRight        = motor(PORT9);
+
+bool pickOrange = false;
+bool pickGreen  = false;
+bool pickPurple = false;
+
 void pre_auton(void) {}
 
 void autonomous(void) {}
 
 void usercontrol(void) {
 
-  notifier nf(Controller1.Screen);
-  // Device check
-  //=========================== TBD NEED TO ADD ==============================
-  devices dvs = devices();
-
+  notifier nf({Controller1.Screen, Controller2.Screen});
+  cGUI cg1(Controller1.Screen);
+  
   while (1) {
-    if (dvs.number() != devices().number()) {
-      nf.addNotification(to_string(devices().number() - dvs.number()) + "");
-    }
 
-    task::sleep(20); // Sleep the task for a short amount of time to prevent
-                     // wasted resources.
+    tankControl(Controller1);
+    if (Controller1.ButtonRight.pressing()) {
+      cg1.shift(cGUI::direction::right);
+    }
+    else if (Controller1.ButtonLeft.pressing()) {
+      cg1.shift(cGUI::direction::left);
+    }
+    else if (Controller1.ButtonB.pressing()) {
+      cg1.toggle();
+    }
+    task::sleep(20); // Sleep the task for a short amount of time to prevent wasted resources.
   }
 }
 

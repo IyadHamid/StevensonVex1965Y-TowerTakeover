@@ -6,30 +6,18 @@
 /*    Description:  Function functionality for display.h                      */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include "components.h"
 #include "display.h"
 
 using namespace std;
 using namespace vex;
 
-/*
- *@brief initalize notifier object
- *@return none
- *@param controller::lcd nlcd, single controller
- */
+//notifier Class
+
 notifier::notifier(controller::lcd nlcd) : lcd({nlcd}) {}
 
-/*
- *@brief initalize notifier object
- *@return none
- *@param vector<controller::lcd> nlcd, vector of screens
- */
 notifier::notifier(vector<controller::lcd> nlcd) : lcd(nlcd) {}
 
-/*
- *@brief Starts marquee scroll text of all present notifications
- *@return none
- *@param none
- */
 void notifier::startNotifications() {
   running = true;
   string notifications;
@@ -50,18 +38,8 @@ void notifier::startNotifications() {
   }
 }
 
-/*
- *@brief Stops text scroll
- *@return none
- *@param none
- */
 void notifier::stopNotifications() { running = false; }
 
-/*
- *@brief Is the notification already there
- *@return boolean, found or not
- *@param string, notification
- */
 bool notifier::hasNotification(string nf) {
   for (const string &inf : nfs) {
     if (nf == inf) {
@@ -71,11 +49,6 @@ bool notifier::hasNotification(string nf) {
   return false;
 }
 
-/*
- *@brief Adds notification to list
- *@return none
- *@param string, notification
- */
 void notifier::addNotification(string nf) {
   if (hasNotification(nf))
     return;
@@ -87,14 +60,8 @@ void notifier::addNotification(string nf) {
   nfs[nfsSlot - 1] = nf;
 }
 
-/*
- *@brief Removes notification from list
- *@return none
- *@param string, notification
- */
 void notifier::removeNotification(string nf) {
-  if (!hasNotification(nf))
-    return;
+  if (!hasNotification(nf)) return;
   for (int i = 0; i < nfsSize; i++) {
     if (nf == nfs[i]) {
       shiftNotifications(i);
@@ -103,21 +70,50 @@ void notifier::removeNotification(string nf) {
   }
 }
 
-/*
- *@brief Clear notifcation list
- *@return none
- *@param none
- */
 void notifier::clearNotification() { fill_n(nfs, nfsSize, ""); }
 
-/*
- *@brief Shifts elements to the left except for one
- *@return none
- *@param int, index to remove
- */
 void notifier::shiftNotifications(int skip) {
   for (int i = skip; i < nfsSize - 1; i++) {
     nfs[i] = nfs[i + 1];
   }
   nfs[nfsSize - 1] = "";
+}
+
+//cGUI Class
+
+cGUI::cGUI(controller::lcd nlcd) : lcd(nlcd) {}
+
+void cGUI::update() {
+  lcd.clearLine(1);
+  lcd.clearLine(2);
+  lcd.setCursor(1, 1);
+  lcd.print(options[index].c_str());
+  lcd.setCursor(2, 1);
+  lcd.print(settings[options[index]]);
+}
+
+void cGUI::toggle() {
+  settings[options[index]] = !settings[options[index]];
+  if (options[index] == "Orange") {
+    pickOrange = settings[options[index]];
+  }
+  else if (options[index] == "Green") {
+    pickGreen = settings[options[index]];
+  }
+  else if (options[index] == "Purple") {
+    pickPurple  = settings[options[index]];
+  }
+  update();
+}
+
+void cGUI::shift(direction dir, int amount) {
+  switch (dir) {
+    case right:
+      index = (index+amount) % settings.size();
+      break;
+    case left:
+      index = (index+settings.size()-(amount%settings.size())) % settings.size();
+      break;
+  }
+  update();
 }

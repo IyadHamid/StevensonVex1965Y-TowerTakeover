@@ -12,8 +12,17 @@
 
 using namespace vex;
 
-brain Brain;
+extern brain Brain;
 
 // motor name = motor( port, reversed? );
-controller Controller1 = controller();
-controller Controller2 = controller();
+extern controller Controller1;
+extern controller Controller2;
+
+extern motor frontLeft;
+extern motor backLeft;
+extern motor frontRight;       
+extern motor backRight;
+
+extern bool pickOrange;
+extern bool pickGreen;
+extern bool pickPurple;

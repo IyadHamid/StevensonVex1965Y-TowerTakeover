@@ -7,10 +7,10 @@ Competition styled for Vex EDR [**Tower Takeover**](https://www.vexrobotics.com/
 - Adam Taylor
 - Andrei Nistor
 - Iyad Hamid - Primary Coder
-- Jonnathan Burrer
+- Jonathan Burrer
 - Joshua Neela
 - Neil Thakker
-- Tanmay Panchpo
+- Tanmay Panchpor
 	
 **Functionality**
 ---
