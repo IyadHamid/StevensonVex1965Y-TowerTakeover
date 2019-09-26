@@ -8,8 +8,9 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
+
 
 #include "vex.h"
 
@@ -17,67 +18,55 @@ using namespace std;
 using namespace vex;
 
 class notifier {
-/*
-*@brief handles and executes notifications
-*/
+  /*
+   *@brief handles and executes notifications
+   */
 
 public:
-
   /*
    *@brief initalize notifier object
-   *@return none
-   *@param controller::lcd nlcd, single controller
+   *@param controller::lcd single controller screen
    */
   notifier(controller::lcd);
 
   /*
    *@brief initalize notifier object
-   *@return none
-   *@param vector<controller::lcd> nlcd, vector of screens
+   *@param vector<controller::lcd> vector of screens
    */
   notifier(vector<controller::lcd>);
   ~notifier();
 
-
   /*
    *@brief Starts marquee scroll text of all present notifications
-   *@return none
-   *@param none
    */
   void startNotifications();
 
   /*
    *@brief Stops text scroll
-   *@return none
-   *@param none
    */
   void stopNotifications();
 
   /*
    *@brief Is the notification already there
-   *@return boolean, found or not
-   *@param string, notification
+   *@return boolean found?
+   *@param string notification
    */
   bool hasNotification(string);
 
   /*
    *@brief Adds notification to list
-   *@return none
-   *@param string, notification
+   *@param string notification
    */
   void addNotification(string);
-  
+
   /*
    *@brief Removes notification from list
-   *@return none
-   *@param string, notification
+   *@param string notification
    */
   void removeNotification(string);
 
   /*
    *@brief Clear notifcation list
-   *@return none
-   *@param none
    */
   void clearNotification();
 
@@ -93,23 +82,25 @@ private:
 };
 
 class cGUI {
-  public:
-    cGUI(controller::lcd);
-    ~cGUI();
+public:
+  cGUI(controller);
+  ~cGUI();
 
-    enum direction {right, left};
+  enum direction { right, left };
 
-    void update();
-    void toggle();
-    void shift(cGUI::direction, int = 1);
+  void control();
+  void update();
+  void toggle();
+  void shift(cGUI::direction, int = 1);
 
-  private:
-    controller::lcd lcd;
-    int index;
+private:
+  controller Controller;
+  int index;
 
-    string options[4] = {"Orange", "Green", "Purple", "Primary"};
-    map<string, bool> settings = { {"Orange", false}, {"Green", false}, 
-                                   {"Purple", false}, {"Primary", false} };
-    bool running;
-
+  string options[4] = {"Orange", "Green", "Purple", "Primary"};
+  map<string, bool> settings = {{"Orange", false},
+                                {"Green", false},
+                                {"Purple", false},
+                                {"Primary", false}};
+  bool running;
 };

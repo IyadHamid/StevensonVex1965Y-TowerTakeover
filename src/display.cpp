@@ -81,15 +81,28 @@ void notifier::shiftNotifications(int skip) {
 
 //cGUI Class
 
-cGUI::cGUI(controller::lcd nlcd) : lcd(nlcd) {}
+cGUI::cGUI(controller nController) : Controller(nController) {}
+
+void cGUI::control() {
+  if (Controller.ButtonRight.pressing()) {
+    shift(cGUI::direction::right);
+  }
+  else if (Controller.ButtonLeft.pressing()) {
+    shift(cGUI::direction::left);
+  }
+  else if (Controller.ButtonB.pressing()) {
+    toggle();
+  }
+
+}
 
 void cGUI::update() {
-  lcd.clearLine(1);
-  lcd.clearLine(2);
-  lcd.setCursor(1, 1);
-  lcd.print(options[index].c_str());
-  lcd.setCursor(2, 1);
-  lcd.print(settings[options[index]]);
+  Controller.Screen.clearLine(1);
+  Controller.Screen.clearLine(2);
+  Controller.Screen.setCursor(1, 1);
+  Controller.Screen.print(options[index].c_str());
+  Controller.Screen.setCursor(2, 1);
+  Controller.Screen.print(settings[options[index]]);
 }
 
 void cGUI::toggle() {
@@ -98,15 +111,15 @@ void cGUI::toggle() {
     pickOrange = settings[options[index]];
   }
   else if (options[index] == "Green") {
-    pickGreen = settings[options[index]];
+    pickGreen  = settings[options[index]];
   }
   else if (options[index] == "Purple") {
-    pickPurple  = settings[options[index]];
+    pickPurple = settings[options[index]];
   }
   update();
 }
 
-void cGUI::shift(direction dir, int amount) {
+void cGUI::shift(cGUI::direction dir, int amount) {
   switch (dir) {
     case right:
       index = (index+amount) % settings.size();

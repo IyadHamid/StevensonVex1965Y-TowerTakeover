@@ -12,6 +12,8 @@
 
 using namespace std;
 
+const double pi = 3.14159265;
+
 /*
  *@brief turns everything into a string
  *@return string from input

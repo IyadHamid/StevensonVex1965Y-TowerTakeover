@@ -23,6 +23,13 @@ extern motor backLeft;
 extern motor frontRight;       
 extern motor backRight;
 
+extern motor cubeLift;
+
+extern encoder encLeft;
+extern encoder encRight;
+
 extern bool pickOrange;
 extern bool pickGreen;
 extern bool pickPurple;
+
+extern double revRatio;
