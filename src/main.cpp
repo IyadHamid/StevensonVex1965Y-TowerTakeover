@@ -6,69 +6,98 @@
 /*    Description:  V5 project                                                */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-#include "common.h"
-#include "components.h"
-#include "controls.h"
-#include "display.h"
+
+// ---- START VEXCODE CONFIGURED DEVICES ----
+// Robot Configuration:
+// [Name]               [Type]        [Port(s)]
+// Controller1          controller                    
+// Controller2          controller                    
+// frontLeft            motor         1               
+// backLeft             motor         2               
+// frontRight           motor         10              
+// backRight            motor         9               
+// intakeLeft           motor         5               
+// intakeRight          motor         6               
+// cubeLift             motor         15              
+// intakeLift           motor         16              
+// PotentiometerA       pot           A               
+// ---- END VEXCODE CONFIGURED DEVICES ----
+
 #include "vex.h"
+#include "display.h"
+#include "controls.h"
+#include "autonomous.h"
 
 using namespace vex;
 
 // A global instance of competition
 competition Competition;
 
-brain Brain;
+// define your global instances of motors and other devices here
 
-controller Controller1 = controller(controllerType::primary);
-controller Controller2 = controller(controllerType::partner);
+/*---------------------------------------------------------------------------*/
+/*                          Pre-Autonomous Functions                         */
+/*                                                                           */
+/*  You may want to perform some actions before the competition starts.      */
+/*  Do them in the following function.  You must return from this function   */
+/*  or the autonomous and usercontrol tasks will not be started.  This       */
+/*  function is only called once after the V5 has been powered on and        */
+/*  not every time that the robot is disabled.                               */
+/*---------------------------------------------------------------------------*/
 
-motor frontLeft        = motor(PORT1 , gearSetting::ratio18_1, true);
-motor backLeft         = motor(PORT2 , gearSetting::ratio18_1, true);
-motor frontRight       = motor(PORT10, gearSetting::ratio18_1);
-motor backRight        = motor(PORT9 , gearSetting::ratio18_1);
+void pre_auton(void) {
+  // Initializing Robot Configuration. DO NOT REMOVE!
+  vexcodeInit();
+  
+  // All activities that occur before the competition starts
+  // Example: clearing encoders, setting servo positions, ...
+}
 
-motor cubeLift         = motor(PORT5 , gearSetting::ratio36_1, true);
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              Autonomous Task                              */
+/*                                                                           */
+/*  This task is used to control your robot during the autonomous phase of   */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
 
-encoder encLeft        = encoder(Brain.ThreeWirePort.A);
-encoder encRight       = encoder(Brain.ThreeWirePort.C);
+void autonomous(void) {
+  // ..........................................................................
+  // Insert autonomous user code here.
+  // ..........................................................................
+}
 
-bool pickOrange = false;
-bool pickGreen  = false;
-bool pickPurple = false;
-
-//revs*(5/3)*2.75" = revs*(5/3)*(11/4)" => revs*(55/12) = distance => distance*12/55 = revs
-double revRatio = 12.0/55.0; //distance to revs
-
-void pre_auton(void) {}
-
-void autonomous(void) {}
+/*---------------------------------------------------------------------------*/
+/*                                                                           */
+/*                              User Control Task                            */
+/*                                                                           */
+/*  This task is used to control your robot during the user control phase of */
+/*  a VEX Competition.                                                       */
+/*                                                                           */
+/*  You must modify the code to add your own robot specific commands here.   */
+/*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-
-  notifier nf({Controller1.Screen, Controller2.Screen});
-  locationHandler lh;
-
-  cGUI cg1(Controller1);
-  travel(10, 10, 1, true);
-  encLeft.resetRotation();
+  // User control code here, inside the loop 
+  cGUI cg = cGUI({Controller1.Screen, Controller2.Screen});
+  notifier nf = notifier({Controller1.Screen, Controller2.Screen});
   while (1) {
-
-    tankControl(Controller1);
-    cg1.control();
-    
-    if (Controller1.ButtonL1.pressing()) {
-      cubeLift.spin(directionType::fwd, 100, velocityUnits::pct);
-    }
-    else if (Controller1.ButtonL2.pressing()) {
-      cubeLift.spin(directionType::rev, 100, velocityUnits::pct);
+    if (cg.Arcade) {
+      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
     else {
-      cubeLift.setBrake(brakeType::hold);
+      tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
-    task::sleep(20); // Sleep the task for a short amount of time to prevent wasted resources.
+    wait(20, msec); // Sleep the task for a short amount of time to
+                    // prevent wasted resources.
   }
 }
 
+//
+// Main will set up the competition functions and callbacks.
+//
 int main() {
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
@@ -76,7 +105,9 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
-  while (1) {
-    task::sleep(100);
+
+  // Prevent main from exiting with an infinite loop.
+  while (true) {
+    wait(100, msec);
   }
 }

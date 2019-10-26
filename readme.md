@@ -14,6 +14,8 @@ Competition styled for Vex EDR [**Tower Takeover**](https://www.vexrobotics.com/
 	
 **Functionality**
 ---
+- Basic controls
+- Custom displacement calculator
 - Notification handler for controller(s)
 
 

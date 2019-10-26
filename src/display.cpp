@@ -3,31 +3,40 @@
 /*    Module:       display.cpp                                               */
 /*    Author:       Stevenson 1965Y (Iyad H)                                  */
 /*    Created:      4 Aug 2019                                                */
-/*    Description:  Function functionality for display.h                      */
+/*    Description:  Functionality for display.h                               */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-#include "components.h"
 #include "display.h"
+#include "common.h"
 
 using namespace std;
 using namespace vex;
 
-//notifier Class
+// notifier Class
 
-notifier::notifier(controller::lcd nlcd) : lcd({nlcd}) {}
+notifier::notifier(controller::lcd nlcd) : lcds({nlcd}) {}
 
-notifier::notifier(vector<controller::lcd> nlcd) : lcd(nlcd) {}
+notifier::notifier(vector<controller::lcd> nlcd) : lcds(nlcd) {}
 
 void notifier::startNotifications() {
   running = true;
   string notifications;
-
+  motor motors[] = {frontLeft,  backLeft, frontRight, backRight,
+                    intakeLift, cubeLift, intakeLeft, intakeRight};
   for (const string &inf : nfs) {
     if (inf != "")
       notifications += " | " + inf;
   }
   while (running) {
-    for (controller::lcd ilcd : lcd) {
+    for (int i = 0; i < sizeof(motors) / sizeof(motors[0]); i++) {
+      if (motors[i].temperature(percentUnits::pct) > 50) {
+        addNotification(
+            to_string(motors[i].index()) + " AT " +
+            to_string(motors[i].temperature(temperatureUnits::celsius)) + "C");
+      }
+    }
+
+    for (controller::lcd ilcd : lcds) {
       ilcd.clearLine(3);
       ilcd.setCursor(3, 0);
       ilcd.print(notifications.c_str());
@@ -61,7 +70,8 @@ void notifier::addNotification(string nf) {
 }
 
 void notifier::removeNotification(string nf) {
-  if (!hasNotification(nf)) return;
+  if (!hasNotification(nf))
+    return;
   for (int i = 0; i < nfsSize; i++) {
     if (nf == nfs[i]) {
       shiftNotifications(i);
@@ -79,54 +89,57 @@ void notifier::shiftNotifications(int skip) {
   nfs[nfsSize - 1] = "";
 }
 
-//cGUI Class
+// cGUI Class
 
-cGUI::cGUI(controller nController) : Controller(nController) {}
+cGUI::cGUI(controller::lcd nlcd) : lcds({nlcd}) {}
 
-void cGUI::control() {
-  if (Controller.ButtonRight.pressing()) {
-    shift(cGUI::direction::right);
+cGUI::cGUI(vector<controller::lcd> nlcd) : lcds(nlcd) {}
+
+void cGUI::control(direction dir, bool t) {
+  if (dir != none) {
+    shift(dir);
   }
-  else if (Controller.ButtonLeft.pressing()) {
-    shift(cGUI::direction::left);
-  }
-  else if (Controller.ButtonB.pressing()) {
+  if (t) {
     toggle();
   }
-
 }
 
 void cGUI::update() {
-  Controller.Screen.clearLine(1);
-  Controller.Screen.clearLine(2);
-  Controller.Screen.setCursor(1, 1);
-  Controller.Screen.print(options[index].c_str());
-  Controller.Screen.setCursor(2, 1);
-  Controller.Screen.print(settings[options[index]]);
+  for (controller::lcd ilcd : lcds) {
+    ilcd.clearLine(1);
+    ilcd.setCursor(1, 1);
+    ilcd.print("%s:\t%s", 
+               opt == Primary ? "Primary" : 
+               opt == Speed ? "Speed" : 
+               "Arcade",
+               settings[opt] ? "True" : "False");
+  }
 }
 
 void cGUI::toggle() {
-  settings[options[index]] = !settings[options[index]];
-  if (options[index] == "Orange") {
-    pickOrange = settings[options[index]];
-  }
-  else if (options[index] == "Green") {
-    pickGreen  = settings[options[index]];
-  }
-  else if (options[index] == "Purple") {
-    pickPurple = settings[options[index]];
+  settings[opt] = !settings[opt];
+  switch (opt) {
+  case Primary:
+    break;
+  case Speed:
+    break;
+  case Arcade:
+    break;
   }
   update();
 }
 
 void cGUI::shift(cGUI::direction dir, int amount) {
+  const int n = 3;
   switch (dir) {
-    case right:
-      index = (index+amount) % settings.size();
-      break;
-    case left:
-      index = (index+settings.size()-(amount%settings.size())) % settings.size();
-      break;
+  case right:
+    index = (index + amount) % n;
+    break;
+  case left:
+    index = (index + n - (amount % n)) % n;
+    break;
+  case none:
+    break;
   }
   update();
 }

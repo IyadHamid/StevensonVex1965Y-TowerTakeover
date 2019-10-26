@@ -15,23 +15,34 @@
 
 using namespace vex;
 
-/*
+/**
  *@brief arcade control
- *@return none
- *@param controller which controller to use
+ *@param int vertical
+ *@param int horizontal
  */
-void arcadeControl(controller Controller);
+void arcadeControl(int, int);
 
-/*
+/**
  *@brief tank control
- *@return none
+ *@param int left side
+ *@param int right side
+ */
+void tankControl(int, int);
+
+/**
+ *@brief lift control
  *@param controller which controller to use
  */
-void tankControl(controller);
+void lift(controller);
 
-/*
+/**
+ *@brief intake control
+ *@param controller which controller to use
+ */
+void intake(controller);
+
+/**
  *@brief move distance
- *@return none
  *@param double distance travel by left
  *@param double distance travel by right
  *@param double time to complete (sec)
@@ -39,9 +50,8 @@ void tankControl(controller);
  */
 void travel(double, double, double, bool = true);
 
-/*
+/**
  *@brief move distance
- *@return none
  *@param double distance to travel
  *@param double time to complete
  *@param bool wait?
