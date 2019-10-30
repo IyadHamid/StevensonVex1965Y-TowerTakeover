@@ -26,7 +26,7 @@
 #include "vex.h"
 #include "display.h"
 #include "controls.h"
-#include "autonomous.h"
+#include "auton.h"
 
 using namespace vex;
 
