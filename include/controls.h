@@ -31,15 +31,18 @@ void tankControl(int, int);
 
 /**
  *@brief lift control
- *@param controller which controller to use
+ *@param motor which controller to use
+ *@param bool go up?
+ *@param bool go down?
+ *@param int veloctiy in rpm
  */
-void lift(controller);
+void lift(motor, bool, bool, int = 50);
 
 /**
  *@brief intake control
- *@param controller which controller to use
+ *@param int velocity pct
  */
-void intake(controller);
+void intake(int);
 
 /**
  *@brief move distance

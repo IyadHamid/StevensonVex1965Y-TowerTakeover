@@ -95,16 +95,8 @@ cGUI::cGUI(controller::lcd nlcd) : lcds({nlcd}) {}
 
 cGUI::cGUI(vector<controller::lcd> nlcd) : lcds(nlcd) {}
 
-void cGUI::control(direction dir, bool t) {
-  if (dir != none) {
-    shift(dir);
-  }
-  if (t) {
-    toggle();
-  }
-}
-
 void cGUI::update() {
+  options opt = (options)index;
   for (controller::lcd ilcd : lcds) {
     ilcd.clearLine(1);
     ilcd.setCursor(1, 1);
@@ -117,8 +109,8 @@ void cGUI::update() {
 }
 
 void cGUI::toggle() {
-  settings[opt] = !settings[opt];
-  switch (opt) {
+  settings[index] = !settings[index];
+  switch ((options)index) {
   case Primary:
     break;
   case Speed:
@@ -129,7 +121,7 @@ void cGUI::toggle() {
   update();
 }
 
-void cGUI::shift(cGUI::direction dir, int amount) {
+void cGUI::shift(direction dir, int amount) {
   const int n = 3;
   switch (dir) {
   case right:

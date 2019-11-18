@@ -91,14 +91,8 @@ public:
 
   enum direction { right, left, none };
   enum options { Primary, Speed, Arcade };
-  options opt = Primary;
 
-  /**
-   *@brief controls GUI elements
-   *@param direction direction to move
-   *@param bool toggle current elem?
-   */
-  void control(direction, bool);
+  bool settings[3] = {0, 0, 0};
 
   /**
    *@brief Updates the screen
@@ -119,8 +113,6 @@ public:
 
 private:
   vector<controller::lcd> lcds;
-  int index;
-
-  bool settings[3] = {0, 0, 0}; // false = 0
+  int index = 0;
   bool running;
 };

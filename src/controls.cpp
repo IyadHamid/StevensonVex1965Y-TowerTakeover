@@ -15,11 +15,11 @@ using namespace vex;
 const double revRatio = 1;
 
 void arcadeControl(int vert, int hori) {
-  // left=(Axis3+Axis4)/2; right=(Axis3-Axis4)/2;
-  frontLeft.spin(directionType::fwd, (vert + hori) / 2, velocityUnits::pct);
-  frontRight.spin(directionType::fwd, (vert - hori) / 2, velocityUnits::pct);
-  backLeft.spin(directionType::fwd, (vert + hori) / 2, velocityUnits::pct);
-  backRight.spin(directionType::fwd, (vert - hori) / 2, velocityUnits::pct);
+  // left=(Axis3+Axis4); right=(Axis3-Axis4);
+  frontLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
+  backLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
+  frontRight.spin(directionType::fwd, (vert - hori),velocityUnits::pct);
+  backRight.spin(directionType::fwd, (vert - hori), velocityUnits::pct);
 }
 
 void tankControl(int left, int right) {
@@ -29,30 +29,19 @@ void tankControl(int left, int right) {
   backRight.spin(directionType::fwd, right, velocityUnits::pct);
 }
 
-void lift(controller Controller) {
-  if (Controller.ButtonL1.pressing()) {
-    cubeLift.spin(directionType::fwd, 50, velocityUnits::rpm);
-  } else if (Controller.ButtonL2.pressing()) {
-    cubeLift.spin(directionType::rev, 50, velocityUnits::rpm);
+void lift(motor m, bool up, bool down, int vel) {
+  if (up) {
+    m.spin(directionType::fwd, vel, velocityUnits::rpm);
+  } else if (down) {
+    m.spin(directionType::rev, vel, velocityUnits::rpm);
   } else {
-    cubeLift.stop(brakeType::hold);
-  }
-
-  if (Controller.ButtonR1.pressing()) {
-    intakeLift.spin(directionType::fwd, 50, velocityUnits::rpm);
-  } else if (Controller.ButtonR2.pressing()) {
-    intakeLift.spin(directionType::rev, 50, velocityUnits::rpm);
-  } else {
-    intakeLift.stop(brakeType::hold);
+    m.stop(brakeType::hold);
   }
 }
 
-void intake(controller Controller) {
-  int l = (pow(Controller.Axis1.value(), 3)) / 10000;
-  int r = (pow(Controller.Axis4.value(), 3)) / 10000;
-
-  intakeLeft.spin(directionType::fwd, l, velocityUnits::pct);
-  intakeRight.spin(directionType::fwd, r, velocityUnits::pct);
+void intake(int vel) {
+  intakeLeft.spin(directionType::fwd, vel, velocityUnits::pct);
+  intakeRight.spin(directionType::fwd, vel, velocityUnits::pct);
 }
 
 void travel(double left, double right, double secs, bool wait) {

@@ -64,9 +64,11 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  // ..........................................................................
-  // Insert autonomous user code here.
-  // ..........................................................................
+  blueUp();
+  blueSide();
+  redUp();
+  redSide();
+  skills();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -83,13 +85,32 @@ void usercontrol(void) {
   // User control code here, inside the loop 
   cGUI cg = cGUI({Controller1.Screen, Controller2.Screen});
   notifier nf = notifier({Controller1.Screen, Controller2.Screen});
+  cg.update();
   while (1) {
-    if (cg.Arcade) {
-      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
+    if (cg.settings[cg.Arcade]) {
+      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis4.position(percent));
     }
     else {
       tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
+    lift(cubeLift, Controller1.ButtonL1.pressing(), Controller1.ButtonL2.pressing());
+    lift(intakeLift, Controller1.ButtonR1.pressing(), Controller1.ButtonR2.pressing());
+
+    if (Controller1.ButtonB.pressing()) {
+      intake(50);
+    }
+    
+    if (Controller1.ButtonLeft.pressing() || Controller2.ButtonLeft.pressing()) {
+      cg.shift(cGUI::direction::left, 1);
+    }
+    else if (Controller1.ButtonRight.pressing() || Controller2.ButtonRight.pressing()) {
+      cg.shift(cGUI::direction::right, 1);
+    }
+    else if (Controller1.ButtonDown.pressing() || Controller2.ButtonDown.pressing()) {
+      cg.toggle();
+    }
+
+
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
   }
@@ -104,6 +125,7 @@ int main() {
   Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
+  vexcodeInit();
   pre_auton();
 
   // Prevent main from exiting with an infinite loop.

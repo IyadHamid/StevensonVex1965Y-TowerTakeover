@@ -14,3 +14,5 @@ void blueSide();
 void redUp();
 
 void redSide();
+
+void skills();
