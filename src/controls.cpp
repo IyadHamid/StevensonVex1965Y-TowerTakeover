@@ -16,17 +16,17 @@ const double revRatio = 1;
 
 void arcadeControl(int vert, int hori) {
   // left=(Axis3+Axis4); right=(Axis3-Axis4);
-  frontLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
-  backLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
-  frontRight.spin(directionType::fwd, (vert - hori),velocityUnits::pct);
-  backRight.spin(directionType::fwd, (vert - hori), velocityUnits::pct);
+  topLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
+  bottomLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
+  topRight.spin(directionType::fwd, (vert - hori),velocityUnits::pct);
+  bottomRight.spin(directionType::fwd, (vert - hori), velocityUnits::pct);
 }
 
 void tankControl(int left, int right) {
-  frontLeft.spin(directionType::fwd, left, velocityUnits::pct);
-  backLeft.spin(directionType::fwd, left, velocityUnits::pct);
-  frontRight.spin(directionType::fwd, right, velocityUnits::pct);
-  backRight.spin(directionType::fwd, right, velocityUnits::pct);
+  topLeft.spin(directionType::fwd, left, velocityUnits::pct);
+  bottomLeft.spin(directionType::fwd, left, velocityUnits::pct);
+  topRight.spin(directionType::fwd, right, velocityUnits::pct);
+  bottomRight.spin(directionType::fwd, right, velocityUnits::pct);
 }
 
 void lift(motor m, bool up, bool down, int vel) {
@@ -47,43 +47,43 @@ void intake(int vel) {
 void travel(double left, double right, double secs, bool wait) {
   double velL = 60.0 * left * revRatio / secs;
   double velR = 60.0 * right * revRatio / secs;
-  frontLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
+  topLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
                       velocityUnits::rpm, false);
-  backLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
+  bottomLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
                      velocityUnits::rpm, false);
-  frontRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
+  topRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
                        velocityUnits::rpm, false);
-  backRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
+  bottomRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
                       velocityUnits::rpm, wait);
 }
 
 void travel(double amount, double secs, bool wait) {
   double vel = 60.0 * amount * revRatio / secs;
-  frontLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+  topLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
                       velocityUnits::rpm, false);
-  backLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+  bottomLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
                      velocityUnits::rpm, false);
-  frontRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+  topRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
                        velocityUnits::rpm, false);
-  backRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+  bottomRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
                       velocityUnits::rpm, wait);
 }
 
-locationHandler::locationHandler() {
+LocationHandler::LocationHandler() {
   loc = {0, 0};
   deg = 0;
 }
 
-locationHandler::locationHandler(location nLoc, double nDeg) {
+LocationHandler::LocationHandler(location nLoc, double nDeg) {
   loc = nLoc;
   deg = nDeg;
 }
-void locationHandler::calcDisp() {
+
+void LocationHandler::calcDisp() {
   const float w = 13.5; // ASSUMING WIDTH = 13.5"
-  double radius =
-      (w * (frontRight.position(turns) + frontLeft.position(turns)) /
-       (2 * (frontRight.position(turns) - frontLeft.position(turns))));
-  deg += (180 * (frontRight.position(turns) - frontLeft.position(turns))) /
+  double radius = (w * (topRight.position(turns) + topLeft.position(turns)) /
+                  (2 * (topRight.position(turns) - topLeft.position(turns))));
+  deg += (180 * (topRight.position(turns) - topLeft.position(turns))) /
          (pi * w);
   loc.x += radius * cos(deg) - radius;
   loc.y += radius * sin(deg);

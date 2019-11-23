@@ -16,103 +16,115 @@
 using namespace std;
 using namespace vex;
 
-class notifier {
-  /**
-   *@brief handles and executes notifications
-   */
+/**
+  * @brief handles and executes notifications
+*/
+class NotificationHandler {
+  private:
+    void shiftNotifications(int = 0);
 
-public:
-  /**
-   *@brief initalize notifier object
-   *@param controller::lcd single controller screen
-   */
-  notifier(controller::lcd);
+    vector<controller::lcd> lcds;
 
-  /**
-   *@brief initalize notifier object
-   *@param vector<controller::lcd> vector of screens
-   */
-  notifier(vector<controller::lcd>);
-  ~notifier();
+    static const int nfsSize = 10;
 
-  /**
-   *@brief Starts marquee scroll text of all present notifications
-   */
-  void startNotifications();
+    string nfs[nfsSize]; // nfs = notifications
 
-  /**
-   *@brief Stops text scroll
-   */
-  void stopNotifications();
+    int nfsSlot = 0;
 
-  /**
-   *@brief Is the notification already there
-   *@return boolean found?
-   *@param string notification
-   */
-  bool hasNotification(string);
+    bool running;
 
-  /**
-   *@brief Adds notification to list
-   *@param string notification
-   */
-  void addNotification(string);
+  public:
+    /**
+      * @brief initalize NotificationHandler object
+      * @param controller::lcd single controller screen
+    */
+    NotificationHandler(controller::lcd);
 
-  /**
-   *@brief Removes notification from list
-   *@param string notification
-   */
-  void removeNotification(string);
+    /**
+      * @brief initalize NotificationHandler object
+      * @param vector<controller::lcd> vector of screens
+    */
+    NotificationHandler(vector<controller::lcd>);
+    ~NotificationHandler();
 
-  /**
-   *@brief Clear notifcation list
-   */
-  void clearNotification();
+    /**
+     * @brief Starts marquee scroll text of all present notifications
+     */
+    void startNotifications();
 
-private:
-  void shiftNotifications(int = 0);
+    /**
+     * @brief Stops text scroll
+     */
+    void stopNotifications();
 
-  vector<controller::lcd> lcds;
+    /**
+     * @brief Is the notification already there
+     * @return boolean found?
+     * @param string notification
+     */
+    bool hasNotification(string);
 
-  static const int nfsSize = 10;
-  string nfs[nfsSize]; // nfs = notifications
-  int nfsSlot = 0;
-  bool running;
+    /**
+     * @brief Adds notification to list
+     * @param string notification
+     */
+    void addNotification(string);
+
+    /**
+     * @brief Removes notification from list
+     * @param string notification
+     */
+    void removeNotification(string);
+
+    /**
+     * @brief Clear notifcation list
+     */
+    void clearNotification();
 };
 
-class cGUI {
-  /**
-   *@brief Controller GUI
-   */
-public:
-  cGUI(controller::lcd);
-  cGUI(vector<controller::lcd>);
-  ~cGUI();
+/**
+  * @brief Controller GUI
+*/
+class ControlGui {
+  private:
+    vector<controller::lcd> lcds;
 
-  enum direction { right, left, none };
-  enum options { Primary, Speed, Arcade };
+    int index = 0;
+    
+    bool running;
 
-  bool settings[3] = {0, 0, 0};
+  public:
+    /**
+      * @brief initializes ControlGui with one lcd
+    */
+    ControlGui(controller::lcd);
 
-  /**
-   *@brief Updates the screen
-   */
-  void update();
+    /**
+      * @brief initializes ControlGui with multiple lcds in a vector
+    */
+    ControlGui(vector<controller::lcd>);
+    ~ControlGui();
+    
+    enum direction { right, left, none };
 
-  /**
-   *@brief Toggle current element
-   */
-  void toggle();
+    enum options { Primary, Speed, Arcade };
 
-  /**
-   *@brief shifts elemnts in a direction with loop
-   *@param direction shift in a
-   *@param amount to shift
-   */
-  void shift(direction, int = 1);
+    bool settings[3] = {0, 0, 0};
 
-private:
-  vector<controller::lcd> lcds;
-  int index = 0;
-  bool running;
+    /**
+     * @brief Updates the screen
+     */
+    void update();
+
+    /**
+     * @brief Toggle current element
+     */
+    void toggle();
+
+    /**
+     * @brief shifts elemnts in a direction with loop
+     * @param direction shift in a
+     * @param amount to shift
+     */
+    void shift(direction, int = 1);
 };

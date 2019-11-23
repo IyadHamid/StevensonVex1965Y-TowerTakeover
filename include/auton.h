@@ -7,12 +7,27 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
+/**
+ * @brief Auton for top blue (from stands)
+*/
 void blueUp();
 
+/**
+ * @brief Auton for side blue (from stands)
+*/
 void blueSide();
 
+/**
+ * @brief Auton for top red (from stands)
+*/
 void redUp();
 
+/**
+ * @brief Auton for side red (from stands)
+*/
 void redSide();
 
+/**
+ * @brief Auton for skills
+*/
 void skills();

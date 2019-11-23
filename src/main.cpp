@@ -7,22 +7,6 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
-// ---- START VEXCODE CONFIGURED DEVICES ----
-// Robot Configuration:
-// [Name]               [Type]        [Port(s)]
-// Controller1          controller                    
-// Controller2          controller                    
-// frontLeft            motor         1               
-// backLeft             motor         2               
-// frontRight           motor         10              
-// backRight            motor         9               
-// intakeLeft           motor         5               
-// intakeRight          motor         6               
-// cubeLift             motor         15              
-// intakeLift           motor         16              
-// PotentiometerA       pot           A               
-// ---- END VEXCODE CONFIGURED DEVICES ----
-
 #include "vex.h"
 #include "display.h"
 #include "controls.h"
@@ -64,10 +48,10 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
-  blueUp();
-  blueSide();
-  redUp();
-  redSide();
+  //blueUp();
+  //blueSide();
+  //redUp();
+  //redSide();
   skills();
 }
 
@@ -83,16 +67,18 @@ void autonomous(void) {
 
 void usercontrol(void) {
   // User control code here, inside the loop 
-  cGUI cg = cGUI({Controller1.Screen, Controller2.Screen});
-  notifier nf = notifier({Controller1.Screen, Controller2.Screen});
+  ControlGui cg = ControlGui({Controller1.Screen, Controller2.Screen});
+  NotificationHandler nf = NotificationHandler({Controller1.Screen, Controller2.Screen});
   cg.update();
-  while (1) {
+
+  while (true) {
     if (cg.settings[cg.Arcade]) {
       arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis4.position(percent));
     }
     else {
       tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
+
     lift(cubeLift, Controller1.ButtonL1.pressing(), Controller1.ButtonL2.pressing());
     lift(intakeLift, Controller1.ButtonR1.pressing(), Controller1.ButtonR2.pressing());
 
@@ -100,16 +86,16 @@ void usercontrol(void) {
       intake(50);
     }
     
+    //Control gui controls
     if (Controller1.ButtonLeft.pressing() || Controller2.ButtonLeft.pressing()) {
-      cg.shift(cGUI::direction::left, 1);
+      cg.shift(ControlGui::direction::left, 1);
     }
     else if (Controller1.ButtonRight.pressing() || Controller2.ButtonRight.pressing()) {
-      cg.shift(cGUI::direction::right, 1);
+      cg.shift(ControlGui::direction::right, 1);
     }
     else if (Controller1.ButtonDown.pressing() || Controller2.ButtonDown.pressing()) {
       cg.toggle();
     }
-
 
     wait(20, msec); // Sleep the task for a short amount of time to
                     // prevent wasted resources.
@@ -130,6 +116,6 @@ int main() {
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
-    wait(100, msec);
+    wait(100, msec); //prevent wastage of resources
   }
 }

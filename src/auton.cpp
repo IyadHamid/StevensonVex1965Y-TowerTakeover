@@ -7,12 +7,12 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
-void blueUp(){}
+void blueUp() {/*Not Yet Implemented*/}
 
-void blueSide(){}
+void blueSide() {/*Not Yet Implemented*/}
 
-void redUp(){}
+void redUp() {/*Not Yet Implemented*/}
 
-void redSide(){}
+void redSide() {/*Not Yet Implemented*/}
 
-void skills(){}
+void skills() {/*Not Yet Implemented*/}

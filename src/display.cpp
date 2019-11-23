@@ -12,16 +12,16 @@
 using namespace std;
 using namespace vex;
 
-// notifier Class
+// NotificationHandler Class
 
-notifier::notifier(controller::lcd nlcd) : lcds({nlcd}) {}
+NotificationHandler::NotificationHandler(controller::lcd nlcd) : lcds({nlcd}) {}
 
-notifier::notifier(vector<controller::lcd> nlcd) : lcds(nlcd) {}
+NotificationHandler::NotificationHandler(vector<controller::lcd> nlcd) : lcds(nlcd) {}
 
-void notifier::startNotifications() {
+void NotificationHandler::startNotifications() {
   running = true;
   string notifications;
-  motor motors[] = {frontLeft,  backLeft, frontRight, backRight,
+  motor motors[] = {topLeft,  bottomLeft, topRight, bottomRight,
                     intakeLift, cubeLift, intakeLeft, intakeRight};
   for (const string &inf : nfs) {
     if (inf != "")
@@ -47,9 +47,9 @@ void notifier::startNotifications() {
   }
 }
 
-void notifier::stopNotifications() { running = false; }
+void NotificationHandler::stopNotifications() { running = false; }
 
-bool notifier::hasNotification(string nf) {
+bool NotificationHandler::hasNotification(string nf) {
   for (const string &inf : nfs) {
     if (nf == inf) {
       return true;
@@ -58,7 +58,7 @@ bool notifier::hasNotification(string nf) {
   return false;
 }
 
-void notifier::addNotification(string nf) {
+void NotificationHandler::addNotification(string nf) {
   if (hasNotification(nf))
     return;
   if (nfsSlot >= nfsSize) {
@@ -69,7 +69,7 @@ void notifier::addNotification(string nf) {
   nfs[nfsSlot - 1] = nf;
 }
 
-void notifier::removeNotification(string nf) {
+void NotificationHandler::removeNotification(string nf) {
   if (!hasNotification(nf))
     return;
   for (int i = 0; i < nfsSize; i++) {
@@ -80,22 +80,22 @@ void notifier::removeNotification(string nf) {
   }
 }
 
-void notifier::clearNotification() { fill_n(nfs, nfsSize, ""); }
+void NotificationHandler::clearNotification() { fill_n(nfs, nfsSize, ""); }
 
-void notifier::shiftNotifications(int skip) {
+void NotificationHandler::shiftNotifications(int skip) {
   for (int i = skip; i < nfsSize - 1; i++) {
     nfs[i] = nfs[i + 1];
   }
   nfs[nfsSize - 1] = "";
 }
 
-// cGUI Class
+// ControlGui Class
 
-cGUI::cGUI(controller::lcd nlcd) : lcds({nlcd}) {}
+ControlGui::ControlGui(controller::lcd nlcd) : lcds({nlcd}) {}
 
-cGUI::cGUI(vector<controller::lcd> nlcd) : lcds(nlcd) {}
+ControlGui::ControlGui(vector<controller::lcd> nlcd) : lcds(nlcd) {}
 
-void cGUI::update() {
+void ControlGui::update() {
   options opt = (options)index;
   for (controller::lcd ilcd : lcds) {
     ilcd.clearLine(1);
@@ -108,7 +108,7 @@ void cGUI::update() {
   }
 }
 
-void cGUI::toggle() {
+void ControlGui::toggle() {
   settings[index] = !settings[index];
   switch ((options)index) {
   case Primary:
@@ -121,7 +121,7 @@ void cGUI::toggle() {
   update();
 }
 
-void cGUI::shift(direction dir, int amount) {
+void ControlGui::shift(direction dir, int amount) {
   const int n = 3;
   switch (dir) {
   case right:
