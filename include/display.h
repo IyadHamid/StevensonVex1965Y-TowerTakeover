@@ -109,7 +109,7 @@ class ControlGui {
 
     enum options { Primary, Speed, Arcade };
 
-    bool settings[3] = {0, 0, 0};
+    bool settings[3] = {0, 0, 1};
 
     /**
      * @brief Updates the screen

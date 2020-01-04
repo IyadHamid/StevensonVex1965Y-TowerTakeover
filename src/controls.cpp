@@ -40,8 +40,14 @@ void lift(motor m, bool up, bool down, int vel) {
 }
 
 void intake(int vel) {
-  intakeLeft.spin(directionType::fwd, vel, velocityUnits::pct);
-  intakeRight.spin(directionType::fwd, vel, velocityUnits::pct);
+  if (vel == 0) {
+    intakeLeft.setBrake(brakeType::hold);
+    intakeRight.setBrake(brakeType::hold);
+  } 
+  else {
+    intakeLeft.spin(directionType::fwd, vel, velocityUnits::pct);
+    intakeRight.spin(directionType::fwd, vel, velocityUnits::pct);
+  }
 }
 
 void travel(double left, double right, double secs, bool wait) {

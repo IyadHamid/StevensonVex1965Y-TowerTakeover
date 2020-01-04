@@ -11,6 +11,7 @@
 #include "display.h"
 #include "controls.h"
 #include "auton.h"
+#include "actions.h"
 
 using namespace vex;
 
@@ -73,19 +74,43 @@ void usercontrol(void) {
 
   while (true) {
     if (cg.settings[cg.Arcade]) {
-      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis4.position(percent));
+      //Drone control
+      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis1.position(percent));
     }
     else {
       tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
 
-    lift(cubeLift, Controller1.ButtonL1.pressing(), Controller1.ButtonL2.pressing());
-    lift(intakeLift, Controller1.ButtonR1.pressing(), Controller1.ButtonR2.pressing());
+    if (Controller1.ButtonX.pressing()) {
+      setLift(1);
+    }
+    else if (Controller1.ButtonA.pressing()) {
+      setLift(0);
+    }
 
-    if (Controller1.ButtonB.pressing()) {
-      intake(50);
+    //Intake lift
+    if (Controller1.ButtonL1.pressing()) {
+      gotoTower(2);
+    }
+    else if (Controller1.ButtonL2.pressing()) {
+      gotoTower(1);
+    }
+    else {
+      gotoTower(0);
+    }
+
+    //Intake
+    if (Controller1.ButtonR1.pressing()) {
+      intake(75);
+    }
+    else if (Controller1.ButtonR2.pressing()) {
+      intake(-50);
+    }
+    else {
+      intake(0);
     }
     
+
     //Control gui controls
     if (Controller1.ButtonLeft.pressing() || Controller2.ButtonLeft.pressing()) {
       cg.shift(ControlGui::direction::left, 1);
@@ -116,6 +141,11 @@ int main() {
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
+    if (Controller1.ButtonUp.pressing()) {
+      goto end;
+    }
     wait(100, msec); //prevent wastage of resources
   }
+  end:
+  wait(0, msec); 
 }

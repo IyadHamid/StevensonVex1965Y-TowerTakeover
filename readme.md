@@ -38,14 +38,14 @@ Find this code [here](https://www.github.com/IyadHamid/StevensonVex1965Y "Steven
 |:-------------|:-----------|:---------|
 |Controller1   | controller |          |
 |Controller2   | controller |          |
-|topLeft       | motor      | 1        |
-|bottomLeft    | motor      | 2        |
+|topLeft       | motor      | 2        |
+|bottomLeft    | motor      | 3        |
 |topRight      | motor      | 10       |
 |bottomRight   | motor      | 9        |
-|intakeLeft    | motor      | 5        |
-|intakeRight   | motor      | 6        |
-|cubeLift      | motor      | 15       |
-|intakeLift    | motor      | 16       |
+|intakeLeft    | motor      | 19       |
+|intakeRight   | motor      | 20       |
+|cubeLift      | motor      | 16       |
+|intakeLift    | motor      | 17       |
 |potentiometer | pot        | A        |
 
 # *...because it "just works".*
