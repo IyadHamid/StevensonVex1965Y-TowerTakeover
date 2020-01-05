@@ -14,8 +14,21 @@
  */
 void setLift(int);
 
+
+/**
+ * @brief redirect to gotoTower 
+ */
+void gotoTower2();
+void gotoTower1();
+
 /**
  * @brief set intake lift to a tower 
  * @param int tower (0 -default, 1 -low, 2-mid)
  */
 void gotoTower(int);
+
+/**
+ * @brief intake control
+ * @param int velocity pct
+*/
+void intake(int);

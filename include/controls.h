@@ -39,12 +39,6 @@ void tankControl(int, int);
 void lift(motor, bool, bool, int = 50);
 
 /**
- * @brief intake control
- * @param int velocity pct
-*/
-void intake(int);
-
-/**
  * @brief move distance
  * @param double distance travel by left
  * @param double distance travel by right

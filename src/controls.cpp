@@ -39,17 +39,6 @@ void lift(motor m, bool up, bool down, int vel) {
   }
 }
 
-void intake(int vel) {
-  if (vel == 0) {
-    intakeLeft.setBrake(brakeType::hold);
-    intakeRight.setBrake(brakeType::hold);
-  } 
-  else {
-    intakeLeft.spin(directionType::fwd, vel, velocityUnits::pct);
-    intakeRight.spin(directionType::fwd, vel, velocityUnits::pct);
-  }
-}
-
 void travel(double left, double right, double secs, bool wait) {
   double velL = 60.0 * left * revRatio / secs;
   double velR = 60.0 * right * revRatio / secs;

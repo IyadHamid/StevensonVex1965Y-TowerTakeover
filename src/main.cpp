@@ -72,13 +72,19 @@ void usercontrol(void) {
   NotificationHandler nf = NotificationHandler({Controller1.Screen, Controller2.Screen});
   cg.update();
 
+
+  Controller1.ButtonL1.pressed(gotoTower2);
+  Controller1.ButtonL2.pressed(gotoTower1);
+
+
   while (true) {
     if (cg.settings[cg.Arcade]) {
-      //Drone control
-      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis1.position(percent));
+      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis4.position(percent)/2);
     }
     else {
-      tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
+      //drone control
+      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis1.position(percent)/2);
+      //tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
 
     if (Controller1.ButtonX.pressing()) {
@@ -88,14 +94,7 @@ void usercontrol(void) {
       setLift(0);
     }
 
-    //Intake lift
-    if (Controller1.ButtonL1.pressing()) {
-      gotoTower(2);
-    }
-    else if (Controller1.ButtonL2.pressing()) {
-      gotoTower(1);
-    }
-    else {
+    if (!(Controller1.ButtonL1.pressing() || Controller1.ButtonL1.pressing())) {
       gotoTower(0);
     }
 
@@ -109,7 +108,6 @@ void usercontrol(void) {
     else {
       intake(0);
     }
-    
 
     //Control gui controls
     if (Controller1.ButtonLeft.pressing() || Controller2.ButtonLeft.pressing()) {
@@ -121,9 +119,6 @@ void usercontrol(void) {
     else if (Controller1.ButtonDown.pressing() || Controller2.ButtonDown.pressing()) {
       cg.toggle();
     }
-
-    wait(20, msec); // Sleep the task for a short amount of time to
-                    // prevent wasted resources.
   }
 }
 
@@ -141,11 +136,6 @@ int main() {
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
-    if (Controller1.ButtonUp.pressing()) {
-      goto end;
-    }
     wait(100, msec); //prevent wastage of resources
   }
-  end:
-  wait(0, msec); 
 }
