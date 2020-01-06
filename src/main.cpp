@@ -17,7 +17,7 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-
+thread macroThread;
 // define your global instances of motors and other devices here
 
 /*---------------------------------------------------------------------------*/
@@ -72,10 +72,19 @@ void usercontrol(void) {
   NotificationHandler nf = NotificationHandler({Controller1.Screen, Controller2.Screen});
   cg.update();
 
+  topLeft    .resetPosition();
+  bottomLeft .resetPosition();
+  topRight   .resetPosition();
+  bottomRight.resetPosition();
+  intakeLeft .resetPosition();
+  intakeRight.resetPosition();
+  cubeLift   .resetPosition();
+  intakeLift .resetPosition();
 
-  Controller1.ButtonL1.pressed(gotoTower2);
-  Controller1.ButtonL2.pressed(gotoTower1);
+  intakeLift.stop(brakeType::hold);
 
+  //Controller1.ButtonL2.pressed(gotoTower2);
+  //Controller1.ButtonL1.pressed(gotoTower1);
 
   while (true) {
     if (cg.settings[cg.Arcade]) {
@@ -94,7 +103,17 @@ void usercontrol(void) {
       setLift(0);
     }
 
-    if (!(Controller1.ButtonL1.pressing() || Controller1.ButtonL1.pressing())) {
+    //if (!(Controller1.ButtonL1.pressing() || Controller1.ButtonL1.pressing())) {
+    if (Controller1.ButtonL1.pressing()) {
+      macroThread.interrupt();
+      macroThread = gotoTower2;
+    }
+    else if (Controller1.ButtonL2.pressing()) {
+      macroThread.interrupt();
+      macroThread = gotoTower1;
+    }
+    else {
+      macroThread.interrupt();
       gotoTower(0);
     }
 
@@ -106,7 +125,7 @@ void usercontrol(void) {
       intake(-50);
     }
     else {
-      intake(0);
+      new thread(stopIntake);
     }
 
     //Control gui controls

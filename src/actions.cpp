@@ -11,12 +11,13 @@
 #include "robot-config.h"
 
 void setLift(int opt) {
+  intakeLift.stop(brakeType::hold);
   switch(opt) {
     case 1:
-      cubeLift.setPosition(6, rotationUnits::rev);
+      cubeLift.rotateTo(6, rotationUnits::rev);
       break;
     default:
-      cubeLift.setPosition(0, rotationUnits::rev);
+      cubeLift.rotateTo(0, rotationUnits::rev);
       break;
   }
 }
@@ -31,42 +32,58 @@ void gotoTower1() {
 void gotoTower(int opt) {
   switch (opt) {
     case 1: //Low
-      cubeLift.rotateTo(3.7, rotationUnits::rev);
-      intakeLift.rotateTo(.7, rotationUnits::rev);
+      Brain.Screen.clearScreen(red);
+      cubeLift.rotateTo(3.7, rotationUnits::rev, 100, velocityUnits::pct, false);
+      waitUntil(cubeLift.position(rotationUnits::rev) > .1);
+      intakeLift.rotateTo(6.8, rotationUnits::rev, 50, velocityUnits::rpm, false);
+      waitUntil(intakeLift.position(rotationUnits::rev) > .9);
+      intakeLift.stop(brakeType::hold);
       break;
     case 2: //Mid
-      cubeLift.rotateTo(3.7, rotationUnits::rev);
-      intakeLift.rotateTo(1.05, rotationUnits::rev);
+      Brain.Screen.clearScreen(green);
+      cubeLift.rotateTo(3.7, rotationUnits::rev, 100, velocityUnits::pct, false);
+      waitUntil(cubeLift.position(rotationUnits::rev) > .1);
+      intakeLift.rotateTo(6.8, rotationUnits::rev, 50, velocityUnits::rpm, false);
+      waitUntil(intakeLift.position(rotationUnits::rev) > .9);
+      intakeLift.stop(brakeType::hold);
       break;
     default: //Reset
-      intakeLift.rotateTo(0, rotationUnits::rev);
+      cubeLift.rotateTo(0, rotationUnits::rev, 100, velocityUnits::pct, false);
+      intakeLift.rotateTo(0, rotationUnits::rev, false);
+      waitUntil(intakeLift.position(rotationUnits::rev) < .1);
       break;
   }
 }
 
+void stopIntake() {
+    intake(0);
+}
 
 void intake(int vel) {
   if (vel == 0) {
-    const double precision = 1000.0;
-    const double ratio = 43.0 / 24.0; // 43/24 = motor rev -> chain rev
-    double val;
-
-    //pos % ratio = get amount after the last cycle
-    val = (((long)round(intakeLeft.position(rotationUnits::rev) * precision) % 
-            (long)round(ratio * precision))) / precision;
-    //get value up to the next cycle
-    val = ratio - val;
-    intakeLeft.rotateFor(val, rotationUnits::rev);
-    intakeLeft.resetPosition();
+    //const double precision = 1000.0;
+    //const double ratio = 43.0 / 24.0; // 43/24 = motor rev -> chain rev
+    //double val;
+    //if (intakeLeft.position(rotationUnits::rev) < -.1 || intakeLeft.position(rotationUnits::rev) > .1) {
+    //  //pos % ratio = get amount after the last cycle
+    //  val = (((long)round(intakeLeft.position(rotationUnits::rev) * precision) % 
+    //          (long)round(ratio * precision))) / precision;
+    //  //get value up to the next cycle
+    //  val = ratio - val;
+    //  intakeLeft.rotateFor(val, rotationUnits::rev);
+    //  intakeLeft.resetPosition();
+    //}
     intakeLeft.stop(brakeType::hold);
 
-    //pos % ratio = get amount after the last cycle
-    val = (((long)round(intakeRight.position(rotationUnits::rev) * precision) % 
-            (long)round(ratio * precision))) / precision;
-    //get value up to the next cycle
-    val = ratio - val;
-    intakeRight.rotateFor(val, rotationUnits::rev);
-    intakeRight.resetPosition();
+    //if (intakeRight.position(rotationUnits::rev) < -.1 || intakeRight.position(rotationUnits::rev) > .1) {
+    //  //pos % ratio = get amount after the last cycle
+    //  val = (((long)round(intakeRight.position(rotationUnits::rev) * precision) % 
+    //          (long)round(ratio * precision))) / precision;
+    //  //get value up to the next cycle
+    //  val = ratio - val;
+    //  intakeRight.rotateFor(val, rotationUnits::rev);
+    //  intakeRight.resetPosition();
+    //}
     intakeRight.stop(brakeType::hold);
   } 
   else {

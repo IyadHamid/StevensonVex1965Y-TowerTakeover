@@ -16,9 +16,13 @@ void setLift(int);
 
 
 /**
- * @brief redirect to gotoTower 
+ * @brief redirect to gotoTower with input of 2 
  */
 void gotoTower2();
+
+/**
+ * @brief redirect to gotoTower with input of 1
+ */
 void gotoTower1();
 
 /**
@@ -26,6 +30,11 @@ void gotoTower1();
  * @param int tower (0 -default, 1 -low, 2-mid)
  */
 void gotoTower(int);
+
+/**
+ * @brief redirect to stopIntake with input of 0
+ */
+void stopIntake();
 
 /**
  * @brief intake control

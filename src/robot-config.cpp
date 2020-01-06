@@ -16,7 +16,7 @@ motor topRight     = motor(PORT10, ratio18_1, true);
 motor bottomRight  = motor(PORT9, ratio18_1, false);
 motor intakeLeft   = motor(PORT19, ratio36_1, false);
 motor intakeRight  = motor(PORT20, ratio36_1, true);
-motor cubeLift     = motor(PORT16, ratio18_1, true);
+motor cubeLift     = motor(PORT16, ratio18_1, false);
 motor intakeLift   = motor(PORT17, ratio18_1, true);
 pot PotentiometerA = pot(Brain.ThreeWirePort.A);
 
@@ -30,5 +30,4 @@ pot PotentiometerA = pot(Brain.ThreeWirePort.A);
  * This should be called at the start of your int main function.
  */
 void vexcodeInit( void ) {
-    intakeLift.setStopping(brakeType::hold);
 }
