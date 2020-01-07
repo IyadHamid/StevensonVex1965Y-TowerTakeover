@@ -8,6 +8,11 @@
 /*----------------------------------------------------------------------------*/
 
 /**
+ * @brief Prior to ALL autons
+*/
+void init();
+
+/**
  * @brief Auton for top blue (from stands)
 */
 void blueUp();

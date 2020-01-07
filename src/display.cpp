@@ -101,7 +101,7 @@ void ControlGui::update() {
     ilcd.clearLine(1);
     ilcd.setCursor(1, 1);
     ilcd.print("%s:\t%s", 
-               opt == Primary ? "Primary" : 
+               opt == Unjam ? "Unjam" : 
                opt == Speed ? "Speed" : 
                "Arcade",
                settings[opt] ? "True" : "False");
@@ -111,7 +111,7 @@ void ControlGui::update() {
 void ControlGui::toggle() {
   settings[index] = !settings[index];
   switch ((options)index) {
-  case Primary:
+  case Unjam:
     break;
   case Speed:
     break;
@@ -134,4 +134,8 @@ void ControlGui::shift(direction dir, int amount) {
     break;
   }
   update();
+}
+
+void ControlGui::setOption(ControlGui::options opt, bool val) {
+  settings[opt] = val;
 }

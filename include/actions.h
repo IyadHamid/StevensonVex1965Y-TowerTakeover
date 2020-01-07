@@ -14,6 +14,21 @@
  */
 void setLift(int);
 
+/**
+ * @brief redirect to setLift with input of 1
+ */
+void setLift1();
+
+/**
+ * @brief redirect to setLift with input of 0
+ */
+void setLift0();
+
+/**
+ * @brief set intake lift to a tower 
+ * @param int tower (0 -default, 1 -low, 2-mid)
+ */
+void gotoTower(int);
 
 /**
  * @brief redirect to gotoTower with input of 2 
@@ -26,18 +41,17 @@ void gotoTower2();
 void gotoTower1();
 
 /**
- * @brief set intake lift to a tower 
- * @param int tower (0 -default, 1 -low, 2-mid)
+ * @brief redirect to gotoTower with input of 0
  */
-void gotoTower(int);
+void gotoTower0();
+
+/**
+ * @brief intake control
+ * @param int velocity in rpm
+*/
+void intake(int);
 
 /**
  * @brief redirect to stopIntake with input of 0
  */
 void stopIntake();
-
-/**
- * @brief intake control
- * @param int velocity pct
-*/
-void intake(int);

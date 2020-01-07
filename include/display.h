@@ -104,12 +104,12 @@ class ControlGui {
     */
     ControlGui(vector<controller::lcd>);
     ~ControlGui();
-    
+  
     enum direction { right, left, none };
 
-    enum options { Primary, Speed, Arcade };
+    enum options { Unjam, Speed, Arcade };
 
-    bool settings[3] = {0, 0, 0};
+    bool settings[3] = {0, 0, 1};
 
     /**
      * @brief Updates the screen
@@ -127,4 +127,11 @@ class ControlGui {
      * @param amount to shift
      */
     void shift(direction, int = 1);
+
+    /**
+     * @brief sets option
+     * @param options option to set
+     * @param bool value to set
+     */
+    void setOption(ControlGui::options opt, bool val);
 };

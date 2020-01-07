@@ -12,13 +12,13 @@
 #include "controls.h"
 #include "auton.h"
 #include "actions.h"
+#include "common.h"
 
 using namespace vex;
 
 // A global instance of competition
 competition Competition;
-thread macroThread;
-// define your global instances of motors and other devices here
+double speedMultiplier;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -34,8 +34,16 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   
-  // All activities that occur before the competition starts
-  // Example: clearing encoders, setting servo positions, ...
+  topLeft    .resetPosition();
+  bottomLeft .resetPosition();
+  topRight   .resetPosition();
+  bottomRight.resetPosition();
+  intakeLeft .resetPosition();
+  intakeRight.resetPosition();
+  cubeLift   .resetPosition();
+  intakeLift .resetPosition();
+
+  intakeLift.stop(brakeType::hold);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -49,6 +57,7 @@ void pre_auton(void) {
 /*---------------------------------------------------------------------------*/
 
 void autonomous(void) {
+  init();
   //blueUp();
   //blueSide();
   //redUp();
@@ -72,60 +81,62 @@ void usercontrol(void) {
   NotificationHandler nf = NotificationHandler({Controller1.Screen, Controller2.Screen});
   cg.update();
 
-  topLeft    .resetPosition();
-  bottomLeft .resetPosition();
-  topRight   .resetPosition();
-  bottomRight.resetPosition();
-  intakeLeft .resetPosition();
-  intakeRight.resetPosition();
-  cubeLift   .resetPosition();
-  intakeLift .resetPosition();
-
-  intakeLift.stop(brakeType::hold);
-
-  //Controller1.ButtonL2.pressed(gotoTower2);
-  //Controller1.ButtonL1.pressed(gotoTower1);
+  int tower = 0;
+  bool intakeRunning = false;
+  thread macroThread = fn_null;
+  thread stopIntakeThread;
 
   while (true) {
     if (cg.settings[cg.Arcade]) {
-      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis4.position(percent)/2);
+      arcadeControl(Controller1.Axis3.position(percent) * speedMultiplier, 
+                    Controller1.Axis4.position(percent) * speedMultiplier / 2);
     }
     else {
       //drone control
-      arcadeControl(Controller1.Axis3.position(percent), Controller1.Axis1.position(percent)/2);
+      arcadeControl(Controller1.Axis3.position(percent) * speedMultiplier, 
+                    Controller1.Axis1.position(percent) * speedMultiplier / 2);
       //tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
 
     if (Controller1.ButtonX.pressing()) {
-      setLift(1);
+      macroThread.interrupt();
+      macroThread = setLift1;
     }
     else if (Controller1.ButtonA.pressing()) {
-      setLift(0);
+      macroThread.interrupt();
+      macroThread = setLift0;
     }
 
-    //if (!(Controller1.ButtonL1.pressing() || Controller1.ButtonL1.pressing())) {
     if (Controller1.ButtonL1.pressing()) {
       macroThread.interrupt();
       macroThread = gotoTower2;
+      tower = 2;
     }
     else if (Controller1.ButtonL2.pressing()) {
       macroThread.interrupt();
       macroThread = gotoTower1;
+      tower = 1;
     }
-    else {
+    else if (tower != 0 && !Controller1.ButtonL1.pressing() && !Controller1.ButtonL2.pressing()) {
       macroThread.interrupt();
-      gotoTower(0);
+      macroThread = gotoTower0;
+      tower = 0;
     }
 
     //Intake
     if (Controller1.ButtonR1.pressing()) {
-      intake(75);
+      intake(100);
+      intakeRunning = true;
     }
     else if (Controller1.ButtonR2.pressing()) {
       intake(-50);
+      intakeRunning = true;
     }
     else {
-      new thread(stopIntake);
+      if (intakeRunning) {
+        stopIntakeThread = stopIntake;
+        intakeRunning = false;
+      }
     }
 
     //Control gui controls
@@ -137,6 +148,26 @@ void usercontrol(void) {
     }
     else if (Controller1.ButtonDown.pressing() || Controller2.ButtonDown.pressing()) {
       cg.toggle();
+    }
+
+    if (cg.Unjam == true) {
+      intakeRunning = false;
+
+      macroThread.interrupt();
+      macroThread = fn_null;
+      stopIntakeThread.interrupt();
+      stopIntakeThread = fn_null;
+      
+      topLeft    .stop(brakeType::coast);
+      bottomLeft .stop(brakeType::coast);
+      topRight   .stop(brakeType::coast);
+      bottomRight.stop(brakeType::coast);
+      intakeLeft .stop(brakeType::coast);
+      intakeRight.stop(brakeType::coast);
+      cubeLift   .stop(brakeType::coast);
+      intakeLift .stop(brakeType::coast);
+
+      cg.setOption(ControlGui::Unjam, false);
     }
   }
 }

@@ -19,8 +19,9 @@ const double pi = 3.14159265;
  * @return string from input
  * @param T anything
  */
-template <typename T> string to_string(const T &n) {
-  ostringstream stm;
-  stm << n;
-  return stm.str();
-}
+template <typename T> string to_string(const T &n);
+
+/**
+ * @brief Null function
+ */
+void fn_null();

@@ -6,6 +6,17 @@
 /*    Description:  Autonomous function implementation                        */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include "vex.h"
+#include "auton.h"
+#include "actions.h"
+#include "robot-config.h"
+
+void init() {
+  intakeLift.rotateTo(.1, rotationUnits::rev, true);
+  this_thread::sleep_for(1);
+  cubeLift.rotateTo(.4, rotationUnits::rev, true);
+  intakeLift.rotateTo(2.5, rotationUnits::rev, true);
+}
 
 void blueUp() {/*Not Yet Implemented*/}
 

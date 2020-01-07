@@ -15,6 +15,7 @@ extern motor cubeLift;
 extern motor intakeLift;
 extern pot PotentiometerA;
 
+extern double speedMultiplier;
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
  * 
