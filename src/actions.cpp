@@ -8,16 +8,25 @@
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include "actions.h"
+#include "common.h"
 #include "robot-config.h"
 
-#define CUBELIFT_UP 3.3
-#define CUBELIFT_MID 1.65
+#define CUBELIFT_UP 2.8
+#define CUBELIFT_MID 1.5
+#define WHEEL_RATIO (60.0/36.0)
 
 void setLift(int opt) {
   intakeLift.stop(brakeType::hold);
   switch(opt) {
     case 1:
-      cubeLift.rotateTo(CUBELIFT_UP, rotationUnits::rev, 70, velocityUnits::rpm);
+      //Need interpolated
+      while (cubeLift.position(rotationUnits::rev) < 2.6) {
+        cubeLift.spin(directionType::fwd,
+                      //40*cos((2*pi/7)*[pos])+40
+                      40.0*cos(((2.0*pi)/7)*cubeLift.position(rotationUnits::rev))+40,
+                      velocityUnits::rpm);
+      }
+      cubeLift.stop(brakeType::hold);
       break;
     default:
       cubeLift.rotateTo(0, rotationUnits::rev, 70, velocityUnits::rpm);
@@ -57,14 +66,17 @@ void gotoTower(int opt) {
     default: //Reset
       speedMultiplier = 1;
       Brain.Screen.clearScreen(blue);
-      intakeLift.setStopping(brakeType::coast);
-      intakeLift.rotateTo(.15, rotationUnits::rev, 80, velocityUnits::pct, false);
-      waitUntil(intakeLift.position(rotationUnits::rev) < .9);
-      cubeLift.rotateTo(0, rotationUnits::rev, 100, velocityUnits::pct, false);
-      waitUntil(intakeLift.position(rotationUnits::rev) < .2);
-      this_thread::sleep_for(10);
-      intakeLift.rotateTo(0, rotationUnits::rev, 10, velocityUnits::pct, false);
-      intakeLift.setStopping(brakeType::brake);
+      while (intakeLift.position(rotationUnits::rev) > .01) {
+        intakeLift.spin(directionType::rev,
+                        //40*tanh(4*([pos]-.2))+40
+                        40*tanh(4*(intakeLift.position(rotationUnits::rev)-.2))+40,
+                        velocityUnits::rpm);
+        if (intakeLift.position(rotationUnits::rev) < 1 && !cubeLift.isSpinning()) {
+          cubeLift.rotateTo(0, rotationUnits::rev);     
+        }
+      }
+      intakeLift.stop(brakeType::coast);
+      cubeLift.rotateTo(0, rotationUnits::rev);
       Brain.Screen.clearScreen();
       break;
   }
@@ -103,4 +115,30 @@ void intake(int vel) {
 
 void stopIntake() {
   intake(0);
+}
+
+
+void travel(double left, double right, double secs, bool wait) {
+  double velL = 60.0 * left * WHEEL_RATIO / secs;
+  double velR = 60.0 * right * WHEEL_RATIO / secs;
+  topLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
+                      velocityUnits::rpm, false);
+  bottomLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
+                     velocityUnits::rpm, false);
+  topRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
+                       velocityUnits::rpm, false);
+  bottomRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
+                      velocityUnits::rpm, wait);
+}
+
+void travel(double amount, double secs, bool wait) {
+  double vel = 60.0 * amount * WHEEL_RATIO / secs;
+  topLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+                      velocityUnits::rpm, false);
+  bottomLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+                     velocityUnits::rpm, false);
+  topRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+                       velocityUnits::rpm, false);
+  bottomRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
+                      velocityUnits::rpm, wait);
 }

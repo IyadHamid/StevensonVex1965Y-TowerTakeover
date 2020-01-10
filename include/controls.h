@@ -39,23 +39,6 @@ void tankControl(int, int);
 void lift(motor, bool, bool, int = 50);
 
 /**
- * @brief move distance
- * @param double distance travel by left
- * @param double distance travel by right
- * @param double time to complete (sec)
- * @param bool wait?
-*/
-void travel(double, double, double, bool = true);
-
-/**
- * @brief move distance
- * @param double distance to travel
- * @param double time to complete
- * @param bool wait?
-*/
-void travel(double, double, bool = true);
-
-/**
   * @brief Tracks displacement with drivetrain setups
 */
 class LocationHandler {

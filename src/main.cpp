@@ -85,16 +85,19 @@ void usercontrol(void) {
   bool intakeRunning = false;
   thread macroThread = fn_null;
   thread stopIntakeThread;
+  
+  //No need to stress motor
+  intakeLift.stop(brakeType::coast);
 
   while (true) {
     if (cg.settings[cg.Arcade]) {
       arcadeControl(Controller1.Axis3.position(percent) * speedMultiplier, 
-                    Controller1.Axis4.position(percent) * speedMultiplier / 2);
+                    Controller1.Axis4.position(percent) * speedMultiplier / 1.2);
     }
     else {
       //drone control
       arcadeControl(Controller1.Axis3.position(percent) * speedMultiplier, 
-                    Controller1.Axis1.position(percent) * speedMultiplier / 2);
+                    Controller1.Axis1.position(percent) * speedMultiplier / 1.2);
       //tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
     }
 
@@ -117,7 +120,7 @@ void usercontrol(void) {
       macroThread = gotoTower1;
       tower = 1;
     }
-    else if (tower != 0 && !Controller1.ButtonL1.pressing() && !Controller1.ButtonL2.pressing()) {
+    else if (tower != 0) {
       macroThread.interrupt();
       macroThread = gotoTower0;
       tower = 0;
@@ -138,7 +141,12 @@ void usercontrol(void) {
         intakeRunning = false;
       }
     }
-
+    
+    if (Controller1.Axis2.position(percent) != 0) {
+      if (Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()) {
+        intakeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
+      }
+    }
     //Control gui controls
     if (Controller1.ButtonLeft.pressing() || Controller2.ButtonLeft.pressing()) {
       cg.shift(ControlGui::direction::left, 1);

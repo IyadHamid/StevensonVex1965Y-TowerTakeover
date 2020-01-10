@@ -18,6 +18,7 @@ motor intakeLeft   = motor(PORT19, ratio36_1, false);
 motor intakeRight  = motor(PORT20, ratio36_1, true);
 motor cubeLift     = motor(PORT16, ratio36_1, false);
 motor intakeLift   = motor(PORT17, ratio36_1, true);
+gyro gyrometer     = gyro(Brain.ThreeWirePort.H);
 pot PotentiometerA = pot(Brain.ThreeWirePort.A);
 
 // VEXcode generated functions
@@ -30,4 +31,5 @@ pot PotentiometerA = pot(Brain.ThreeWirePort.A);
  * This should be called at the start of your int main function.
  */
 void vexcodeInit( void ) {
+  gyrometer.calibrate();
 }

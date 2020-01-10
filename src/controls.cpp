@@ -12,8 +12,6 @@
 using namespace std;
 using namespace vex;
 
-const double revRatio = 1;
-
 void arcadeControl(int vert, int hori) {
   // left=(Axis3+Axis4); right=(Axis3-Axis4);
   topLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
@@ -37,31 +35,6 @@ void lift(motor m, bool up, bool down, int vel) {
   } else {
     m.stop(brakeType::hold);
   }
-}
-
-void travel(double left, double right, double secs, bool wait) {
-  double velL = 60.0 * left * revRatio / secs;
-  double velR = 60.0 * right * revRatio / secs;
-  topLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
-                      velocityUnits::rpm, false);
-  bottomLeft.rotateFor(directionType::fwd, left, rotationUnits::rev, velL,
-                     velocityUnits::rpm, false);
-  topRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
-                       velocityUnits::rpm, false);
-  bottomRight.rotateFor(directionType::fwd, right, rotationUnits::rev, velR,
-                      velocityUnits::rpm, wait);
-}
-
-void travel(double amount, double secs, bool wait) {
-  double vel = 60.0 * amount * revRatio / secs;
-  topLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
-                      velocityUnits::rpm, false);
-  bottomLeft.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
-                     velocityUnits::rpm, false);
-  topRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
-                       velocityUnits::rpm, false);
-  bottomRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
-                      velocityUnits::rpm, wait);
 }
 
 LocationHandler::LocationHandler() {

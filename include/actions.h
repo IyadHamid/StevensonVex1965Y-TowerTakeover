@@ -55,3 +55,20 @@ void intake(int);
  * @brief redirect to stopIntake with input of 0
  */
 void stopIntake();
+
+/**
+ * @brief move distance
+ * @param double distance travel by left
+ * @param double distance travel by right
+ * @param double time to complete (sec)
+ * @param bool wait?
+*/
+void travel(double, double, double, bool = true);
+
+/**
+ * @brief move distance
+ * @param double distance to travel
+ * @param double time to complete
+ * @param bool wait?
+*/
+void travel(double, double, bool = true);

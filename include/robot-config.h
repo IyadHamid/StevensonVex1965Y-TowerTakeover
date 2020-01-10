@@ -13,6 +13,7 @@ extern motor intakeLeft;
 extern motor intakeRight;
 extern motor cubeLift;
 extern motor intakeLift;
+extern gyro gyrometer;
 extern pot PotentiometerA;
 
 extern double speedMultiplier;

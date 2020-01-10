@@ -25,7 +25,7 @@ Find this code [here](https://www.github.com/IyadHamid/StevensonVex1965Y "Steven
   - Multiple lcd support
   - Modular/Copy & Pastable
 - Realtime graphical variable controller
-  - Change Arcade to Take in-game!
+  - Change Arcade to Drone (could change to tank) in-game!
   - Multiple lcd support
   - Modular/Copy & Pastable
 - All 5 Autonomous

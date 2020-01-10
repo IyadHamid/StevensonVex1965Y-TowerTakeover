@@ -12,10 +12,10 @@
 #include "robot-config.h"
 
 void init() {
-  intakeLift.rotateTo(.1, rotationUnits::rev, true);
-  this_thread::sleep_for(1);
-  cubeLift.rotateTo(.4, rotationUnits::rev, true);
-  intakeLift.rotateTo(2.5, rotationUnits::rev, true);
+  //intakeLift.rotateTo(.1, rotationUnits::rev, true);
+  //this_thread::sleep_for(1);
+  //cubeLift.rotateTo(.4, rotationUnits::rev, true);
+  //intakeLift.rotateTo(2.5, rotationUnits::rev, true);
 }
 
 void blueUp() {/*Not Yet Implemented*/}
@@ -26,4 +26,6 @@ void redUp() {/*Not Yet Implemented*/}
 
 void redSide() {/*Not Yet Implemented*/}
 
-void skills() {/*Not Yet Implemented*/}
+void skills() {
+  travel(1.0, 5);
+}
