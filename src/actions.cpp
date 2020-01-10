@@ -85,7 +85,6 @@ void gotoTower0() {
 void intake(int vel) {
   if (vel == 0) {
     intakeLeft.stop(brakeType::hold);
-
     intakeRight.rotateFor(intakeLeft.position(rotationUnits::deg) - intakeRight.position(rotationUnits::deg), rotationUnits::deg);
     intakeRight.stop(brakeType::hold);
   } 
@@ -103,4 +102,26 @@ void intake(int vel) {
 
 void stopIntake() {
   intake(0);
+}
+
+void faceAngle(double deg, double precision) {
+  while (!(inert.yaw() < deg + precision && inert.yaw() > deg - precision)) {
+    if (inert.yaw() > deg + precision) { //Rotate left
+      leftDrive.spin(directionType::fwd,
+                     40*tanh(.04*((deg - inert.yaw())-40))+40, 
+                     velocityUnits::rpm);
+      rightDrive.spin(directionType::fwd,
+                      -40*tanh(.04*((deg - inert.yaw())+40))+40, 
+                      velocityUnits::rpm);
+    }
+    else if (inert.yaw() < deg - precision) { //Rotate right
+      rightDrive.spin(directionType::fwd,
+                      40*tanh(.04*((deg - inert.yaw())-40))+40, 
+                      velocityUnits::rpm);
+      leftDrive.spin(directionType::fwd,
+                     -40*tanh(.04*((deg - inert.yaw())+40))+40, 
+                     velocityUnits::rpm);
+    }
+  }
+  allDrive.stop(brakeType::brake);
 }

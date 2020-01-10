@@ -55,3 +55,9 @@ void intake(int);
  * @brief redirect to stopIntake with input of 0
  */
 void stopIntake();
+
+/**
+ * @brief make the robot face angle relative to inital position
+ * @param double degrees
+*/
+void faceAngle(double, double = 1);

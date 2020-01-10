@@ -1,5 +1,8 @@
 using namespace vex;
 
+//Motor -> Distance: Gear ratio*Circumference
+#define WHEEL_RATIO (60.0/36.0)*(2.75*pi)
+
 extern brain Brain;
 
 // VEXcode devices
@@ -13,6 +16,13 @@ extern motor intakeLeft;
 extern motor intakeRight;
 extern motor cubeLift;
 extern motor intakeLift;
+
+extern motor_group leftDrive;
+extern motor_group rightDrive;
+extern motor_group allDrive;
+extern motor_group intakes;
+
+extern inertial inert;
 extern pot PotentiometerA;
 
 extern double speedMultiplier;
