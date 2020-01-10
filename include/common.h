@@ -8,8 +8,6 @@
 /*----------------------------------------------------------------------------*/
 #pragma once
 
-#include <sstream>
-
 using namespace std;
 
 const double pi = 3.14159265;

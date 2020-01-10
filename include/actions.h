@@ -72,3 +72,7 @@ void travel(double, double, double, bool = true);
  * @param bool wait?
 */
 void travel(double, double, bool = true);
+ * @brief make the robot face angle relative to inital position
+ * @param double degrees
+*/
+void faceAngle(double, double = 1);

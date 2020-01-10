@@ -6,9 +6,12 @@
 /*    Description:  Autonomous function implementation                        */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include <vector>
+
 #include "vex.h"
 #include "auton.h"
 #include "actions.h"
+#include "controls.h"
 #include "robot-config.h"
 
 void init() {
@@ -27,5 +30,14 @@ void redUp() {/*Not Yet Implemented*/}
 void redSide() {/*Not Yet Implemented*/}
 
 void skills() {
-  travel(1.0, 5);
+  intakes.spin(directionType::fwd);
+  allDrive.rotateFor(10 * WHEEL_RATIO, rotationUnits::deg);
+  intakes.stop();
+  allDrive.rotateFor(-9 * WHEEL_RATIO, rotationUnits::deg);
+  faceAngle(90);
+  allDrive.rotateFor(10 * WHEEL_RATIO, rotationUnits::deg);
+  faceAngle(0);
+  allDrive.rotateFor(9 * WHEEL_RATIO, rotationUnits::deg);
+  faceAngle(180);
+  allDrive.rotateFor(9 * WHEEL_RATIO, rotationUnits::deg);
 }

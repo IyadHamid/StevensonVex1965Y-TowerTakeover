@@ -6,8 +6,10 @@
 /*    Description:  User controls implementation/movement                     */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#include "vex.h"
 #include "controls.h"
-#include "robot-config.h"
+#include "actions.h"
+#include "common.h"
 
 using namespace std;
 using namespace vex;

@@ -43,7 +43,8 @@ void pre_auton(void) {
   cubeLift   .resetPosition();
   intakeLift .resetPosition();
 
-  intakeLift.stop(brakeType::hold);
+  intakeLift.stop(brakeType::coast);
+  inert.setRotation(90, rotationUnits::deg);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -185,8 +186,8 @@ void usercontrol(void) {
 //
 int main() {
   // Set up callbacks for autonomous and driver control periods.
-  Competition.autonomous(autonomous);
-  Competition.drivercontrol(usercontrol);
+  skills();//Competition.autonomous(autonomous);
+  //Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
   vexcodeInit();
