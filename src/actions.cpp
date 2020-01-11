@@ -13,7 +13,6 @@
 
 #define CUBELIFT_UP 2.8
 #define CUBELIFT_MID 1.5
-#define WHEEL_RATIO (60.0/36.0)
 
 void setLift(int opt) {
   intakeLift.stop(brakeType::hold);
@@ -140,21 +139,29 @@ void travel(double amount, double secs, bool wait) {
   bottomRight.rotateFor(directionType::fwd, amount, rotationUnits::rev, vel,
                       velocityUnits::rpm, wait);
 }
+
 void faceAngle(double deg, double precision) {
-    if (inert.yaw() > deg + precision) { //Rotate left
+  int dir;
+  while (inert.heading() > deg + precision || inert.heading() < deg - precision) {
+    Brain.Screen.printAt(0, 59, "%f", inert.heading());
+
+    //num = (abs((int)(inert.heading() - deg))) % 360;
+    dir = ((int)inert.heading() + 360 - ((int)deg % 360)) % 360;
+    
+    if (inert.heading() > deg + precision) { //Rotate left
       leftDrive.spin(directionType::fwd,
-                     40*tanh(.04*((deg - inert.yaw())-40))+40, 
+                     30*tanh(.04*((deg - inert.heading())-40))+30, 
                      velocityUnits::rpm);
-      rightDrive.spin(directionType::fwd,
-                      -40*tanh(.04*((deg - inert.yaw())+40))+40, 
+      rightDrive.spin(directionType::rev,
+                      30*tanh(.04*((deg - inert.heading())-40))+30, 
                       velocityUnits::rpm);
     }
-    else if (inert.yaw() < deg - precision) { //Rotate right
+    else if (inert.heading() < deg - precision) { //Rotate right
       rightDrive.spin(directionType::fwd,
-                      40*tanh(.04*((deg - inert.yaw())-40))+40, 
+                      30*tanh(.04*((deg - inert.heading())-40))+30, 
                       velocityUnits::rpm);
-      leftDrive.spin(directionType::fwd,
-                     -40*tanh(.04*((deg - inert.yaw())+40))+40, 
+      leftDrive.spin(directionType::rev,
+                     30*tanh(.04*((deg - inert.heading())-40))+30, 
                      velocityUnits::rpm);
     }
   }
