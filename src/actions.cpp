@@ -141,14 +141,14 @@ void travel(double amount, double secs, bool wait) {
 }
 
 void faceAngle(double deg, double precision) {
-  int dir;
+  int opposite;
   while (inert.heading() > deg + precision || inert.heading() < deg - precision) {
-    Brain.Screen.printAt(0, 59, "%f", inert.heading());
+    opposite = (int)(inert.heading() + 180) % 360;
 
-    //num = (abs((int)(inert.heading() - deg))) % 360;
-    dir = ((int)inert.heading() + 360 - ((int)deg % 360)) % 360;
-    
-    if (inert.heading() > deg + precision) { //Rotate left
+    //Rotate left
+    if ((inert.heading() > deg && deg > opposite) ||
+        (deg > opposite && opposite > inert.heading()) ||
+        (opposite > inert.heading() && inert.heading() > deg)) {
       leftDrive.spin(directionType::fwd,
                      30*tanh(.04*((deg - inert.heading())-40))+30, 
                      velocityUnits::rpm);
@@ -156,7 +156,8 @@ void faceAngle(double deg, double precision) {
                       30*tanh(.04*((deg - inert.heading())-40))+30, 
                       velocityUnits::rpm);
     }
-    else if (inert.heading() < deg - precision) { //Rotate right
+    //Rotate right
+    else {
       rightDrive.spin(directionType::fwd,
                       30*tanh(.04*((deg - inert.heading())-40))+30, 
                       velocityUnits::rpm);

@@ -147,6 +147,9 @@ void usercontrol(void) {
       if (Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()) {
         intakeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
       }
+      if (Controller1.ButtonX.pressing()) {
+        cubeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
+      }
     }
     //Control gui controls
     if (Controller1.ButtonLeft.pressing() || Controller2.ButtonLeft.pressing()) {
