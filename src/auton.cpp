@@ -24,14 +24,18 @@ void init() {
 void blueUp() {/*Not Implemented*/}
 
 void blueSide() {
+  intake(100);
   allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
+  intake(0);
 
   faceAngle(335);
 
   allDrive.rotateFor(directionType::rev, 41.75 * WHEEL_RATIO, rotationUnits::deg);
   leftDrive.rotateFor(directionType::rev, 9.25 * WHEEL_RATIO, rotationUnits::deg);
 
+  intake(100);
   allDrive.rotateFor(directionType::fwd, 40, rotationUnits::deg);
+  intake(0);
 
   faceAngle(45);
 
@@ -45,14 +49,19 @@ void blueSide() {
 void redUp() {/*Not Implemented*/}
 
 void redSide() {
+
+  intake(100);
   allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
+  intake(0);
 
   faceAngle(25);
 
   allDrive.rotateFor(directionType::rev, 41.75 * WHEEL_RATIO, rotationUnits::deg);
   leftDrive.rotateFor(directionType::rev, 9.25 * WHEEL_RATIO, rotationUnits::deg);
 
+  intake(100);
   allDrive.rotateFor(directionType::fwd, 40, rotationUnits::deg);
+  intake(0);
 
   faceAngle(135);
 
