@@ -21,23 +21,48 @@ void init() {
   //intakeLift.rotateTo(2.5, rotationUnits::rev, true);
 }
 
-void blueUp() {/*Not Yet Implemented*/}
+void blueUp() {/*Not Implemented*/}
 
-void blueSide() {/*Not Yet Implemented*/}
+void blueSide() {
+  allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
 
-void redUp() {/*Not Yet Implemented*/}
+  faceAngle(335);
 
-void redSide() {/*Not Yet Implemented*/}
+  allDrive.rotateFor(directionType::rev, 41.75 * WHEEL_RATIO, rotationUnits::deg);
+  leftDrive.rotateFor(directionType::rev, 9.25 * WHEEL_RATIO, rotationUnits::deg);
+
+  allDrive.rotateFor(directionType::fwd, 40, rotationUnits::deg);
+
+  faceAngle(45);
+
+  allDrive.rotateFor(directionType::fwd, 55 * WHEEL_RATIO, rotationUnits::deg);
+
+  setLift(1);
+
+  allDrive.rotateFor(directionType::rev, 10 * WHEEL_RATIO, rotationUnits::deg);
+}
+
+void redUp() {/*Not Implemented*/}
+
+void redSide() {
+  allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
+
+  faceAngle(25);
+
+  allDrive.rotateFor(directionType::rev, 41.75 * WHEEL_RATIO, rotationUnits::deg);
+  leftDrive.rotateFor(directionType::rev, 9.25 * WHEEL_RATIO, rotationUnits::deg);
+
+  allDrive.rotateFor(directionType::fwd, 40, rotationUnits::deg);
+
+  faceAngle(135);
+
+  allDrive.rotateFor(directionType::fwd, 55 * WHEEL_RATIO, rotationUnits::deg);
+
+  setLift(1);
+
+  allDrive.rotateFor(directionType::rev, 10 * WHEEL_RATIO, rotationUnits::deg);
+}
 
 void skills() {
-  intakes.spin(directionType::fwd);
-  allDrive.rotateFor(10 * WHEEL_RATIO, rotationUnits::deg);
-  intakes.stop();
-  allDrive.rotateFor(-9 * WHEEL_RATIO, rotationUnits::deg);
-  faceAngle(90);
-  allDrive.rotateFor(10 * WHEEL_RATIO, rotationUnits::deg);
-  faceAngle(0);
-  allDrive.rotateFor(9 * WHEEL_RATIO, rotationUnits::deg);
-  faceAngle(180);
-  allDrive.rotateFor(9 * WHEEL_RATIO, rotationUnits::deg);
+  redSide();
 }
