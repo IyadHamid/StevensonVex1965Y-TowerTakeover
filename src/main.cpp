@@ -34,17 +34,16 @@ void pre_auton(void) {
   // Initializing Robot Configuration. DO NOT REMOVE!
   vexcodeInit();
   
-  topLeft    .resetPosition();
-  bottomLeft .resetPosition();
-  topRight   .resetPosition();
-  bottomRight.resetPosition();
-  intakeLeft .resetPosition();
-  intakeRight.resetPosition();
-  cubeLift   .resetPosition();
-  intakeLift .resetPosition();
+  topLeft    .resetRotation();
+  bottomLeft .resetRotation();
+  topRight   .resetRotation();
+  bottomRight.resetRotation();
+  intakeLeft .resetRotation();
+  intakeRight.resetRotation();
+  cubeLift   .resetRotation();
+  intakeLift .resetRotation();
 
   intakeLift.stop(brakeType::coast);
-  inert.setRotation(90, rotationUnits::deg);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -59,11 +58,11 @@ void pre_auton(void) {
 
 void autonomous(void) {
   init();
-  //blueUp();
+  blueUp();
   //blueSide();
   //redUp();
   //redSide();
-  skills();
+  //skills();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -84,13 +83,16 @@ void usercontrol(void) {
 
   int tower = 0;
   bool intakeRunning = false;
+  bool liftUp = false;
   thread macroThread = fn_null;
-  thread stopIntakeThread;
-  
   //No need to stress motor
   intakeLift.stop(brakeType::coast);
 
   while (true) {
+    if (Controller1.ButtonY.pressing()) {
+      macroThread.interrupt();
+      macroThread = init;
+    }
     if (cg.settings[cg.Arcade]) {
       arcadeControl(Controller1.Axis3.position(percent) * speedMultiplier, 
                     Controller1.Axis4.position(percent) * speedMultiplier / 1.2);
@@ -105,10 +107,12 @@ void usercontrol(void) {
     if (Controller1.ButtonX.pressing()) {
       macroThread.interrupt();
       macroThread = setLift1;
+      liftUp = true;
     }
     else if (Controller1.ButtonA.pressing()) {
       macroThread.interrupt();
       macroThread = setLift0;
+      liftUp = false;
     }
 
     if (Controller1.ButtonL1.pressing()) {
@@ -138,7 +142,7 @@ void usercontrol(void) {
     }
     else {
       if (intakeRunning) {
-        stopIntakeThread = stopIntake;
+        intake(0);
         intakeRunning = false;
       }
     }
@@ -147,10 +151,18 @@ void usercontrol(void) {
       if (Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()) {
         intakeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
       }
-      if (Controller1.ButtonX.pressing()) {
-        cubeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
+      if (liftUp) {
+        cubeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/8, velocityUnits::rpm);
       }
     }
+
+    if (Controller2.Axis3.position(percent) != 0) {
+      cubeLift.spin(directionType::fwd, Controller2.Axis3.position(percent)/5, velocityUnits::rpm);
+    }
+
+
+
+
     //Control gui controls
     if (Controller1.ButtonLeft.pressing() || Controller2.ButtonLeft.pressing()) {
       cg.shift(ControlGui::direction::left, 1);
@@ -162,13 +174,11 @@ void usercontrol(void) {
       cg.toggle();
     }
 
-    if (cg.Unjam == true) {
+    if (cg.settings[ControlGui::Unjam] == true) {
       intakeRunning = false;
 
       macroThread.interrupt();
       macroThread = fn_null;
-      stopIntakeThread.interrupt();
-      stopIntakeThread = fn_null;
       
       topLeft    .stop(brakeType::coast);
       bottomLeft .stop(brakeType::coast);
@@ -193,8 +203,12 @@ int main() {
   Competition.drivercontrol(usercontrol);
 
   // Run the pre-autonomous function.
-  vexcodeInit();
   pre_auton();
+
+  while (inert.isCalibrating()) {
+    Brain.Screen.clearScreen(white);
+  }
+  Brain.Screen.clearScreen(black);
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

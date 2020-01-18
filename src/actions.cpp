@@ -12,7 +12,7 @@
 #include "robot-config.h"
 
 #define CUBELIFT_UP 2.8
-#define CUBELIFT_MID 1.5
+#define CUBELIFT_MID 1.6
 
 void setLift(int opt) {
   intakeLift.stop(brakeType::hold);
@@ -49,7 +49,7 @@ void gotoTower(int opt) {
       Brain.Screen.clearScreen(red);
       cubeLift.rotateTo(CUBELIFT_MID, rotationUnits::rev, 100, velocityUnits::pct, false);
       this_thread::sleep_for(1);
-      intakeLift.rotateTo(.85, rotationUnits::rev, 50, velocityUnits::rpm, true);
+      intakeLift.rotateTo(.95, rotationUnits::rev, 50, velocityUnits::rpm, true);
       intakeLift.stop(brakeType::hold);
       Brain.Screen.clearScreen();
       break;
@@ -58,7 +58,7 @@ void gotoTower(int opt) {
       Brain.Screen.clearScreen(green);
       cubeLift.rotateTo(CUBELIFT_MID, rotationUnits::rev, 100, velocityUnits::pct, false);
       this_thread::sleep_for(1);
-      intakeLift.rotateTo(1.15, rotationUnits::rev, 50, velocityUnits::rpm, true);
+      intakeLift.rotateTo(1.25, rotationUnits::rev, 50, velocityUnits::rpm, true);
       intakeLift.stop(brakeType::hold);
       Brain.Screen.clearScreen();
       break;
@@ -95,9 +95,7 @@ void gotoTower0() {
 
 void intake(int vel) {
   if (vel == 0) {
-    intakeLeft.stop(brakeType::hold);
-    intakeRight.rotateFor(intakeLeft.position(rotationUnits::deg) - intakeRight.position(rotationUnits::deg), rotationUnits::deg);
-    intakeRight.stop(brakeType::hold);
+    intakes.stop(brakeType::hold);
   } 
   else {
     if (intakeLeft.position(rotationUnits::deg) < intakeRight.position(rotationUnits::deg)) {
@@ -141,30 +139,42 @@ void travel(double amount, double secs, bool wait) {
 }
 
 void faceAngle(double deg, double precision) {
-  int opposite;
-  while (inert.heading() > deg + precision || inert.heading() < deg - precision) {
-    opposite = (int)(inert.heading() + 180) % 360;
+  double opposite = (int)round(inert.heading() + 180) % 360;
+  double fn;
+  double l;
+  double r;
+  //precision
+  const int pR = (int)(deg + precision) % 360;
+  const int pL = (int)(deg + 360 - ((int)precision % 360)) % 360;
 
-    //Rotate left
-    if ((inert.heading() > deg && deg > opposite) ||
-        (deg > opposite && opposite > inert.heading()) ||
-        (opposite > inert.heading() && inert.heading() > deg)) {
+  //Until within range (in a circle [0,360))
+  while (!((pL < opposite && opposite < pR) ||
+          (opposite < pR && pR < pL) ||
+          (pR < pL && pL < opposite))) {
+    opposite = (int)round(inert.heading() + 180) % 360;
+
+    Brain.Screen.printAt(0,175,"%d %d %d", 
+        (int)(pL < opposite && opposite < pR), 
+        (int)(opposite < pR && pR < pL), 
+        (int)(pR < pL && pL < opposite));
+    Brain.Screen.printAt(0,75,"deg:%lf   heading:%lf          ", deg, inert.heading());
+    Brain.Screen.printAt(0,100,"opp:%lf          ", opposite);
+    l = (int)round((360+deg) - opposite) % 360; //Left rotation
+    r = (int)round((360+opposite) - deg) % 360; //Right rotation
+    //fn = distance from target degree
+    fn = r > l ? l : -r;
+    Brain.Screen.printAt(0,125,"Angle to rot: %lf", fn);
+    //fn now looks like x^3 with a gap at 0,0 (similar to piecewise w/ 2 x^2)
+    fn = .001 * (fn < 0 ? -1 : 1) * (pow(fn, 2) + 100);
+    //wrap fn in tanh (makes it into a modified sigmoid function)
+    fn = 60 * tanh(fn);
+    Brain.Screen.printAt(0,150,"rpm on left: %lf", fn);
       leftDrive.spin(directionType::fwd,
-                     30*tanh(.04*((deg - inert.heading())-40))+30, 
+                     fn, 
                      velocityUnits::rpm);
       rightDrive.spin(directionType::rev,
-                      30*tanh(.04*((deg - inert.heading())-40))+30, 
+                      fn,
                       velocityUnits::rpm);
-    }
-    //Rotate right
-    else {
-      rightDrive.spin(directionType::fwd,
-                      30*tanh(.04*((deg - inert.heading())-40))+30, 
-                      velocityUnits::rpm);
-      leftDrive.spin(directionType::rev,
-                     30*tanh(.04*((deg - inert.heading())-40))+30, 
-                     velocityUnits::rpm);
-    }
   }
   allDrive.stop(brakeType::brake);
 }

@@ -37,5 +37,5 @@ pot PotentiometerA = pot(Brain.ThreeWirePort.A);
  * This should be called at the start of your int main function.
  */
 void vexcodeInit( void ) {
-  
+  inert.startCalibration();
 }
