@@ -28,7 +28,7 @@ void init() {
   hasInit = true;
 }
 
-void blueUp() {
+void oneCube() {
   allDrive.rotateFor(directionType::fwd, 20 * WHEEL_RATIO, rotationUnits::deg);
   allDrive.rotateFor(directionType::rev, 14 * WHEEL_RATIO, rotationUnits::deg);
 }
@@ -56,8 +56,6 @@ void blueSide() {
   allDrive.rotateFor(directionType::rev, 10 * WHEEL_RATIO, rotationUnits::deg);
 }
 
-void redUp() {/*Not Implemented*/}
-
 void redSide() {
 
   intake(100);
@@ -83,5 +81,9 @@ void redSide() {
 }
 
 void skills() {
-  redSide();
+  oneCube();
+}
+
+void debug() {
+  faceAngle(270);
 }

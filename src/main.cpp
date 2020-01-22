@@ -14,6 +14,8 @@
 #include "actions.h"
 #include "common.h"
 
+#define FORCE_AUTON
+
 using namespace vex;
 
 // A global instance of competition
@@ -58,11 +60,7 @@ void pre_auton(void) {
 
 void autonomous(void) {
   init();
-  blueUp();
-  //blueSide();
-  //redUp();
-  //redSide();
-  //skills();
+  debug();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -209,6 +207,11 @@ int main() {
     Brain.Screen.clearScreen(white);
   }
   Brain.Screen.clearScreen(black);
+
+  
+#ifdef FORCE_AUTON
+  autonomous();
+#endif
 
   // Prevent main from exiting with an infinite loop.
   while (true) {

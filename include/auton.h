@@ -13,19 +13,14 @@
 void init();
 
 /**
- * @brief Auton for top blue (from stands)
+ * @brief Auton to get a single cube
 */
-void blueUp();
+void oneCube();
 
 /**
  * @brief Auton for side blue (from stands)
 */
 void blueSide();
-
-/**
- * @brief Auton for top red (from stands)
-*/
-void redUp();
 
 /**
  * @brief Auton for side red (from stands)
@@ -36,3 +31,8 @@ void redSide();
  * @brief Auton for skills
 */
 void skills();
+
+/**
+ * @brief debug Auton
+*/
+void debug();
