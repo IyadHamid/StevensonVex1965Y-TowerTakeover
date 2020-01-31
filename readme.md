@@ -18,9 +18,10 @@ Find this code [here](https://www.github.com/IyadHamid/StevensonVex1965Y "Steven
 ## **Functionality**
 
 - Basic controls
-  - Tank and Arcade
+  - Tank, Arcade, & Drone!
 - Displacement calculator
   - Found from basic drivetrain motor encoders
+  - With basic algebra and trigonometry
 - Notification handler w/ multiple lcd support
   - Multiple lcd support
   - Modular/Copy & Pastable
@@ -28,24 +29,29 @@ Find this code [here](https://www.github.com/IyadHamid/StevensonVex1965Y "Steven
   - Change Arcade to Drone (could change to tank) in-game!
   - Multiple lcd support
   - Modular/Copy & Pastable
-- All 5 Autonomous
+- Autonomous functions
 - Vex-styled in-code documentation & format
   - Multi-file orginization
+- Interpolated Motor Rotations
+  - Using functions like `tanh` and `cos`!
+  - Less velocity = less force and strain on parts
+- With modular and specific code to the Robot
+- And much more!
 
 ## **Robot Configuration**
 
-|Name          | Type       | Port(s)  |
-|:-------------|:-----------|:---------|
-|Controller1   | controller |          |
-|Controller2   | controller |          |
-|topLeft       | motor      | 2        |
-|bottomLeft    | motor      | 3        |
-|topRight      | motor      | 10       |
-|bottomRight   | motor      | 9        |
-|intakeLeft    | motor      | 19       |
-|intakeRight   | motor      | 20       |
-|cubeLift      | motor      | 16       |
-|intakeLift    | motor      | 17       |
-|potentiometer | pot        | A        |
+|Name            | Type       | Port(s)  |
+|:---------------|:-----------|:---------|
+|`Controller1   `| controller |          |
+|`Controller2   `| controller |          |
+|`topLeft       `| motor      | 2        |
+|`bottomLeft    `| motor      | 3        |
+|`topRight      `| motor      | 10       |
+|`bottomRight   `| motor      | 9        |
+|`intakeLeft    `| motor      | 19       |
+|`intakeRight   `| motor      | 20       |
+|`cubeLift      `| motor      | 16       |
+|`intakeLift    `| motor      | 17       |
+|`indexer       `| line       | H        |
 
 # *...because it "just works".*

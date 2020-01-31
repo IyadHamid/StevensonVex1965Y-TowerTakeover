@@ -14,7 +14,8 @@
 #include "actions.h"
 #include "common.h"
 
-#define FORCE_AUTON
+//Force running auton after init
+#define FORCE_AUTON 0
 
 using namespace vex;
 
@@ -46,6 +47,14 @@ void pre_auton(void) {
   intakeLift .resetRotation();
 
   intakeLift.stop(brakeType::coast);
+  
+  //wait until inertial is done calibrating
+  //also calibrate indexer
+  while (inert.isCalibrating()) {
+    Brain.Screen.clearScreen(white);
+    ambientLight = (ambientLight + indexer.value(analogUnits::mV)) / 2;
+  }
+  Brain.Screen.clearScreen(black);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -60,7 +69,8 @@ void pre_auton(void) {
 
 void autonomous(void) {
   init();
-  debug();
+  red4Cube();
+  //debug();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -74,7 +84,6 @@ void autonomous(void) {
 /*---------------------------------------------------------------------------*/
 
 void usercontrol(void) {
-  // User control code here, inside the loop 
   ControlGui cg = ControlGui({Controller1.Screen, Controller2.Screen});
   NotificationHandler nf = NotificationHandler({Controller1.Screen, Controller2.Screen});
   cg.update();
@@ -82,37 +91,62 @@ void usercontrol(void) {
   int tower = 0;
   bool intakeRunning = false;
   bool liftUp = false;
+  bool buttonXPressed = false;
+  bool axis2Reset = false;
+  //Used for multithreading ("blocking" code)
   thread macroThread = fn_null;
   //No need to stress motor
   intakeLift.stop(brakeType::coast);
 
+  //Drive controls are for some reason locked
+  //gotoTower(0) unlocks it
+  gotoTower(0);
+
   while (true) {
+    //Initialize incase for skills
     if (Controller1.ButtonY.pressing()) {
       macroThread.interrupt();
       macroThread = init;
     }
-    if (cg.settings[cg.Arcade]) {
-      arcadeControl(Controller1.Axis3.position(percent) * speedMultiplier, 
-                    Controller1.Axis4.position(percent) * speedMultiplier / 1.2);
+
+    //Robot Movement
+    if (!isUsed.driveMotors) {
+      if (cg.settings[cg.Arcade]) {
+        //normal arcade control
+        arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
+                      Controller1.Axis4.position() * speedMultiplier / 1.2);
+      }
+      else {
+        //drone control
+        arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
+                      Controller1.Axis1.position() * speedMultiplier / 1.2);
+        //tank control
+        //tankControl(Controller1.Axis3.position(percent), 
+        //            Controller1.Axis2.position(percent));
+      }
+    }
+
+    //Set lift up/down in toggle mode
+    if (Controller1.ButtonX.pressing()) {
+      if (!buttonXPressed) {
+        if (!liftUp) {
+          macroThread.interrupt();
+          macroThread = setLift1;
+          liftUp = true;
+        }
+        else {
+          macroThread.interrupt();
+          macroThread = setLift0;
+          liftUp = false;
+        }
+      }
+      buttonXPressed = true;
     }
     else {
-      //drone control
-      arcadeControl(Controller1.Axis3.position(percent) * speedMultiplier, 
-                    Controller1.Axis1.position(percent) * speedMultiplier / 1.2);
-      //tankControl(Controller1.Axis3.position(percent), Controller1.Axis2.position(percent));
+      buttonXPressed = false;
     }
 
-    if (Controller1.ButtonX.pressing()) {
-      macroThread.interrupt();
-      macroThread = setLift1;
-      liftUp = true;
-    }
-    else if (Controller1.ButtonA.pressing()) {
-      macroThread.interrupt();
-      macroThread = setLift0;
-      liftUp = false;
-    }
-
+    //goto tower macros
     if (Controller1.ButtonL1.pressing()) {
       macroThread.interrupt();
       macroThread = gotoTower2;
@@ -144,18 +178,24 @@ void usercontrol(void) {
         intakeRunning = false;
       }
     }
+    if (Controller1.ButtonB.pressing()) {
+      putCubeInIntakes(); //Is already non-blocking
+    }
     
+    //Precision placement controls
     if (Controller1.Axis2.position(percent) != 0) {
+      axis2Reset = true;
       if (Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()) {
         intakeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
       }
-      if (liftUp) {
+      else if (liftUp) {
         cubeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/8, velocityUnits::rpm);
       }
     }
-
-    if (Controller2.Axis3.position(percent) != 0) {
-      cubeLift.spin(directionType::fwd, Controller2.Axis3.position(percent)/5, velocityUnits::rpm);
+    if (axis2Reset && Controller1.Axis2.value() == 0) {
+      intakeLift.stop();
+      cubeLift.stop();
+      axis2Reset = true;
     }
 
 
@@ -202,19 +242,16 @@ int main() {
 
   // Run the pre-autonomous function.
   pre_auton();
-
-  while (inert.isCalibrating()) {
-    Brain.Screen.clearScreen(white);
-  }
-  Brain.Screen.clearScreen(black);
-
   
-#ifdef FORCE_AUTON
+#if FORCE_AUTON
   autonomous();
 #endif
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
+    //Brain.Screen.printAt(0, 50, "Raw: %f", ultraSonic.distance(distanceUnits::in));
+    //
+    //Brain.Screen.printAt(0, 75, "fn: %f", ultraSonic.distance(distanceUnits::in));
     wait(100, msec); //prevent wastage of resources
   }
 }

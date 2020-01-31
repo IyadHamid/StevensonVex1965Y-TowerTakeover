@@ -18,12 +18,17 @@ void init();
 void oneCube();
 
 /**
- * @brief Auton for side blue (from stands)
+ * @brief Auton for side blue
 */
 void blueSide();
 
 /**
- * @brief Auton for side red (from stands)
+ * @brief 4 point for side red
+*/
+void red4Cube();
+
+/**
+ * @brief Auton for side red
 */
 void redSide();
 

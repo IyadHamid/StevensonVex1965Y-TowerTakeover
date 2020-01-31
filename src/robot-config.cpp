@@ -25,12 +25,16 @@ motor_group allDrive(topLeft, bottomLeft, topRight, bottomRight);
 motor_group intakes(intakeLeft, intakeRight);
 
 inertial inert     = inertial(PORT18);
+sonar ultraSonic   = sonar(Brain.ThreeWirePort.C);
+line indexer       = line(Brain.ThreeWirePort.H);
 pot PotentiometerA = pot(Brain.ThreeWirePort.A);
 
-// VEXcode generated functions
+bool driveMacroed = false;
+motorUsed isUsed = {
+  .driveMotors = 0
+};
 
-
-
+int ambientLight = 0;
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Text.
  * 

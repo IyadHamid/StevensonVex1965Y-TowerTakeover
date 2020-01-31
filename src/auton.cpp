@@ -17,13 +17,10 @@
 bool hasInit = false;
 
 void init() {
-  //intakeLift.rotateTo(.1, rotationUnits::rev, true);
-  //this_thread::sleep_for(1);
-  //cubeLift.rotateTo(.4, rotationUnits::rev, true);
-  //intakeLift.rotateTo(2.5, rotationUnits::rev, true);
   if (!hasInit) {
     cubeLift.rotateTo(.43, rotationUnits::rev, false);
     cubeLift.resetRotation();
+    ambientLight = (ambientLight + indexer.value(analogUnits::mV)) / 2;
   }
   hasInit = true;
 }
@@ -56,8 +53,13 @@ void blueSide() {
   allDrive.rotateFor(directionType::rev, 10 * WHEEL_RATIO, rotationUnits::deg);
 }
 
-void redSide() {
+void red4Cube() {
+  intake(100);
+  allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
+  intake(0);
+}
 
+void redSide() {
   intake(100);
   allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
   intake(0);
@@ -85,5 +87,8 @@ void skills() {
 }
 
 void debug() {
-  faceAngle(270);
+  Brain.Screen.print("DEBUG AUTON");
+  waitUntil(Brain.Screen.pressing());
+  putCubeInIntakes();
+  Brain.Screen.print("GOODBYE");
 }

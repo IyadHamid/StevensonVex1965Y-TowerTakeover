@@ -23,3 +23,9 @@ template <typename T> string to_string(const T &n);
  * @brief Null function
  */
 void fn_null();
+
+/**
+ * @brief gets the answer to life, the universe, and everything
+ * @return int the answer
+ */
+int getAnswerToLifeTheUniverseAndEverything();

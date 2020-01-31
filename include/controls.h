@@ -39,6 +39,15 @@ void tankControl(int, int);
 void lift(motor, bool, bool, int = 50);
 
 /**
+ * @brief gets sonar distance calibrated within a time
+ * @param sonar sonar sensor to use
+ * @param double time in ms
+ * @param distanceUnits units of distance
+ * @return double distance
+*/
+double getSafeSonarDistance(sonar, double, vex::distanceUnits = vex::distanceUnits::in);
+
+/**
   * @brief Tracks displacement with drivetrain setups
 */
 class LocationHandler {

@@ -21,6 +21,7 @@ NotificationHandler::NotificationHandler(vector<controller::lcd> nlcd) : lcds(nl
 void NotificationHandler::startNotifications() {
   running = true;
   string notifications;
+  //Array of all the motors
   motor motors[] = {topLeft,  bottomLeft, topRight, bottomRight,
                     intakeLift, cubeLift, intakeLeft, intakeRight};
   for (const string &inf : nfs) {
@@ -28,6 +29,7 @@ void NotificationHandler::startNotifications() {
       notifications += " | " + inf;
   }
   while (running) {
+    //Adds overheated motors to the notifications
     for (int i = 0; i < sizeof(motors) / sizeof(motors[0]); i++) {
       if (motors[i].temperature(percentUnits::pct) > 50) {
         addNotification(
@@ -83,6 +85,7 @@ void NotificationHandler::removeNotification(string nf) {
 void NotificationHandler::clearNotification() { fill_n(nfs, nfsSize, ""); }
 
 void NotificationHandler::shiftNotifications(int skip) {
+  //Shift notifications to the left and deletes 'skip' elements
   for (int i = skip; i < nfsSize - 1; i++) {
     nfs[i] = nfs[i + 1];
   }
@@ -90,7 +93,6 @@ void NotificationHandler::shiftNotifications(int skip) {
 }
 
 // ControlGui Class
-
 ControlGui::ControlGui(controller::lcd nlcd) : lcds({nlcd}) {}
 
 ControlGui::ControlGui(vector<controller::lcd> nlcd) : lcds(nlcd) {}
@@ -110,14 +112,6 @@ void ControlGui::update() {
 
 void ControlGui::toggle() {
   settings[index] = !settings[index];
-  switch ((options)index) {
-  case Unjam:
-    break;
-  case Speed:
-    break;
-  case Arcade:
-    break;
-  }
   update();
 }
 
@@ -125,9 +119,11 @@ void ControlGui::shift(direction dir, int amount) {
   const int n = 3;
   switch (dir) {
   case right:
+    //Right shift in range (add)
     index = (index + amount) % n;
     break;
   case left:
+    //Left shift in range (subtract)
     index = (index + n - (amount % n)) % n;
     break;
   case none:

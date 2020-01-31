@@ -57,24 +57,26 @@ void intake(int);
 void stopIntake();
 
 /**
- * @brief move distance
- * @param double distance travel by left
- * @param double distance travel by right
- * @param double time to complete (sec)
- * @param bool wait?
+ * @brief move distance (relative system)
+ * @param double rotation to travel
+ * @param double precision (set to 2)
+ * @param rotationUnits units (set to degrees)
 */
-void travel(double, double, double, bool = true);
+void travel(double, double = 2, vex::rotationUnits = vex::rotationUnits::deg);
 
 /**
- * @brief move distance
- * @param double distance to travel
- * @param double time to complete
- * @param bool wait?
-*/
-void travel(double, double, bool = true);
-
-/*
- * @brief make the robot face angle relative to inital position
+ * @brief make the robot face angle (absolute system)
  * @param double degrees
+ * @param double precsion (set to 1)
 */
 void faceAngle(double, double = 1);
+
+/**
+ * @brief Puts cubes above the line sensor
+*/
+void putAllCubesAboveLine();
+
+/**
+ * @brief Puts a cube directly beetween the intakes
+*/
+void putCubeInIntakes();
