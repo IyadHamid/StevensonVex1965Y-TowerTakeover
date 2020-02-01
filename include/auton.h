@@ -18,6 +18,11 @@ void init();
 void oneCube();
 
 /**
+ * @brief 4 point for side red
+*/
+void blue4Cube();
+
+/**
  * @brief Auton for side blue
 */
 void blueSide();

@@ -33,6 +33,23 @@ void oneCube() {
   allDrive.rotateFor(directionType::rev, 14 * WHEEL_RATIO, rotationUnits::deg);
 }
 
+void blue4Cube() {
+  intake(170);
+  travel(-45 * WHEEL_RATIO, 200);
+  faceAngle(30, 50);
+  travel(7 * WHEEL_RATIO, 200);
+  wait(200, timeUnits::msec);
+  intake(0);
+  travel(-7 * WHEEL_RATIO, 200);
+  wait(100, timeUnits::msec);
+  faceAngle(180);
+  travel(25 * WHEEL_RATIO);
+  faceAngle(-135);
+  travel(22 * WHEEL_RATIO);
+  setLift(1);
+  setLift(0);
+}
+
 void blueSide() {
   intake(100);
   allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
