@@ -7,6 +7,10 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
+/**
+ * @brief callback for arcade controls
+ */
+void doArcade();
 
 /**
  * @brief set intake lift to a tower 
@@ -59,17 +63,18 @@ void stopIntake();
 /**
  * @brief move distance (relative system)
  * @param double rotation to travel
+ * @param double velocity in dps
  * @param double precision (set to 2)
  * @param rotationUnits units (set to degrees)
 */
-void travel(double, double = 2, vex::rotationUnits = vex::rotationUnits::deg);
+void travel(double, double = 500, double = 2, vex::rotationUnits = vex::rotationUnits::deg);
 
 /**
  * @brief make the robot face angle (absolute system)
  * @param double degrees
  * @param double precsion (set to 1)
 */
-void faceAngle(double, double = 1);
+void faceAngle(double, double = 60, double = 1);
 
 /**
  * @brief Puts cubes above the line sensor

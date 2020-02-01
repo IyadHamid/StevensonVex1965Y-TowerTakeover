@@ -14,11 +14,14 @@
 #include "controls.h"
 #include "robot-config.h"
 
+//Initalize once
 bool hasInit = false;
 
 void init() {
   if (!hasInit) {
-    cubeLift.rotateTo(.43, rotationUnits::rev, false);
+    Brain.Screen.print("INIT");
+    //Put tray a bit forward
+    cubeLift.rotateTo(.6, rotationUnits::rev, false);
     cubeLift.resetRotation();
     ambientLight = (ambientLight + indexer.value(analogUnits::mV)) / 2;
   }
@@ -54,9 +57,20 @@ void blueSide() {
 }
 
 void red4Cube() {
-  intake(100);
-  allDrive.rotateFor(directionType::fwd, 40 * WHEEL_RATIO, rotationUnits::deg);
+  intake(170);
+  travel(45 * WHEEL_RATIO, 200);
+  faceAngle(-30, 50);
+  travel(7 * WHEEL_RATIO, 200);
+  wait(200, timeUnits::msec);
   intake(0);
+  travel(-7 * WHEEL_RATIO, 200);
+  wait(100, timeUnits::msec);
+  faceAngle(180);
+  travel(25 * WHEEL_RATIO);
+  faceAngle(135);
+  travel(22 * WHEEL_RATIO);
+  setLift(1);
+  setLift(0);
 }
 
 void redSide() {
@@ -89,6 +103,6 @@ void skills() {
 void debug() {
   Brain.Screen.print("DEBUG AUTON");
   waitUntil(Brain.Screen.pressing());
-  putCubeInIntakes();
+  travel(0 * WHEEL_RATIO);
   Brain.Screen.print("GOODBYE");
 }

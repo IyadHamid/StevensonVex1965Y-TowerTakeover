@@ -19,10 +19,13 @@ using namespace vex;
 void arcadeControl(int vert, int hori) {
   //left=(vert+hori)
   //right=(vert-hori)
-  topLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
-  bottomLeft.spin(directionType::fwd, (vert + hori), velocityUnits::pct);
-  topRight.spin(directionType::fwd, (vert - hori),velocityUnits::pct);
-  bottomRight.spin(directionType::fwd, (vert - hori), velocityUnits::pct);
+  //Change to rpm
+  vert *= 2;
+  hori *= 2;
+  topLeft.spin(directionType::fwd, (vert + hori), velocityUnits::rpm);
+  bottomLeft.spin(directionType::fwd, (vert + hori), velocityUnits::rpm);
+  topRight.spin(directionType::fwd, (vert - hori),velocityUnits::rpm);
+  bottomRight.spin(directionType::fwd, (vert - hori), velocityUnits::rpm);
 }
 
 void tankControl(int left, int right) {

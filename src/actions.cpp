@@ -8,17 +8,24 @@
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include "actions.h"
+#include "controls.h"
 #include "common.h"
 #include "robot-config.h"
 
 //Put the tray to be perpendicular to the floor
 #define CUBELIFT_UP 2.85
 //Put the tray to the middle
-#define CUBELIFT_MID 1.6
+#define CUBELIFT_MID 1.7
 //Put intake lift to the mid tower
 #define MID_TOWER 1.25
 //Put intake lift to the low tower
 #define LOW_TOWER .95
+
+void doArcade() {
+  //normal arcade control
+  arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
+                Controller1.Axis4.position() * speedMultiplier / 1.2);
+}
 
 void setLift(int opt) {
   //Lock the intake lift
@@ -37,13 +44,11 @@ void setLift(int opt) {
       intakes.stop();
       break;
     default:
-      isUsed.driveMotors = 1; //Don't allow manual movement 
       //Put the cube lift down and back off
-      //intakes.spin(directionType::rev, 200, velocityUnits::rpm);
+      intakes.spin(directionType::rev, 80, velocityUnits::rpm);
       cubeLift.rotateTo(0, rotationUnits::rev, 70, velocityUnits::rpm, false);
-      allDrive.rotateFor(directionType::rev, 2 * WHEEL_RATIO, rotationUnits::deg);
-      //intakes.stop();
-      isUsed.driveMotors = 0;
+      allDrive.rotateFor(directionType::rev, 7 * WHEEL_RATIO, rotationUnits::deg, 80, velocityUnits::rpm);
+      intakes.stop();
       break;
   }
 }
@@ -134,39 +139,40 @@ void stopIntake() {
   intake(0);
 }
 
-void travel(double amount, double precision, rotationUnits rotUnits) {
+void travel(double amount, double vel, double precision, rotationUnits rotUnits) {
   //Function is relative
   bottomLeft.resetRotation();
 
   //Convert to revolutions
-  if (rotUnits == rotationUnits::deg) {
-    amount /= 360;
-    precision /= 360;
+  if (rotUnits == rotationUnits::rev) {
+    amount *= 360.0;
+    precision *= 360.0;
   }
 
   //Until within range of precision
-  while (!(bottomLeft.rotation(rotationUnits::rev) < amount + precision &&
-           bottomLeft.rotation(rotationUnits::rev) > amount - precision)) {
-    Brain.Screen.printAt(0,75,"amt:%lf   encoder:%lf          ", amount, bottomLeft.rotation(rotationUnits::rev));
+  while (!(bottomLeft.rotation(rotationUnits::deg) < amount + precision &&
+           bottomLeft.rotation(rotationUnits::deg) > amount - precision)) {
+    Brain.Screen.printAt(0,75,"amt:%lf   encoder:%lf        ", amount, bottomLeft.rotation(rotationUnits::rev));
+    Brain.Screen.printAt(0,200,"%lf  %lf", amount - precision, amount + precision);    
     //fn = displacement (revolutions) to target
-    double fn = amount - bottomLeft.rotation(rotationUnits::rev);
+    double fn = amount - bottomLeft.rotation(rotationUnits::deg);
     Brain.Screen.printAt(0,100,"Dist to move: %lf       ", fn);
     //fn can be represented as a piecewise function:
     //      / .001(x^2) + 100, x >= 0
     //fn = {
     //      \ -.001(x^2) + 100, x < 0
-    fn = (fn < 0 ? -1 : 1)* .001 * (pow(fn, 2) + 100);
+    fn = (fn < 0 ? -1 : 1)* (.00001 * pow(fn, 2) + .15);
     //wrap fn in tanh (makes it into a modified sigmoid function)
-    //fn = 60tanh((|x|/x) * .001(x^2) + 100)
-    fn = 200 * tanh(fn);
+    //fn = vel * tanh((|x|/x) * (.00001(x^2) + .15))
+    fn = vel * tanh(fn);
     //fn is used to interpolate the velocoity of the robot in rpm (for motors)
-    Brain.Screen.printAt(0,125,"rpm: %lf       ", fn);
-    allDrive.spin(directionType::fwd, fn, velocityUnits::rpm);
+    Brain.Screen.printAt(0,125,"dps: %lf       ", fn);
+    allDrive.spin(directionType::fwd, fn, velocityUnits::dps);
   }
   allDrive.stop(brakeType::brake);
 }
 
-void faceAngle(double deg, double precision) {
+void faceAngle(double deg, double vel, double precision) {
   //Get heading within [0,360)
   double dir = (int)round(inert.heading()) % 360; //Direction heading integer
   double fn;                                      //Math function
@@ -197,8 +203,8 @@ void faceAngle(double deg, double precision) {
     //      \ -.001(x^2) + 100, x < 0
     fn = (fn < 0 ? -1 : 1)* .001 * (pow(fn, 2) + 100);
     //wrap fn in tanh (makes it into a modified sigmoid function)
-    //fn = 60tanh((|x|/x) * .001(x^2) + 100)
-    fn = 60 * tanh(fn);
+    //fn = vel * tanh((|x|/x) * .001((x^2) + 100))
+    fn = vel * tanh(fn);
     //fn is used to interpolate the angular velocity of the robot rotating in rpm (for motors)
     Brain.Screen.printAt(0,150,"rpm on left: %lf", fn);
     leftDrive.spin(directionType::fwd, fn, velocityUnits::rpm);

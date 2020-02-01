@@ -70,7 +70,6 @@ void pre_auton(void) {
 void autonomous(void) {
   init();
   red4Cube();
-  //debug();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -102,28 +101,13 @@ void usercontrol(void) {
   //gotoTower(0) unlocks it
   gotoTower(0);
 
+  Controller1.Axis3.changed(doArcade);
+  Controller1.Axis4.changed(doArcade);
   while (true) {
     //Initialize incase for skills
     if (Controller1.ButtonY.pressing()) {
       macroThread.interrupt();
       macroThread = init;
-    }
-
-    //Robot Movement
-    if (!isUsed.driveMotors) {
-      if (cg.settings[cg.Arcade]) {
-        //normal arcade control
-        arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
-                      Controller1.Axis4.position() * speedMultiplier / 1.2);
-      }
-      else {
-        //drone control
-        arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
-                      Controller1.Axis1.position() * speedMultiplier / 1.2);
-        //tank control
-        //tankControl(Controller1.Axis3.position(percent), 
-        //            Controller1.Axis2.position(percent));
-      }
     }
 
     //Set lift up/down in toggle mode
@@ -195,7 +179,7 @@ void usercontrol(void) {
     if (axis2Reset && Controller1.Axis2.value() == 0) {
       intakeLift.stop();
       cubeLift.stop();
-      axis2Reset = true;
+      axis2Reset = false;
     }
 
 
