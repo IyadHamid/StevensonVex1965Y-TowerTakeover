@@ -15,7 +15,7 @@
 //Put the tray to be perpendicular to the floor
 #define CUBELIFT_UP 2.85
 //Put the tray to the middle
-#define CUBELIFT_MID 1.7
+#define CUBELIFT_MID 1.6
 //Put intake lift to the mid tower
 #define MID_TOWER 1.25
 //Put intake lift to the low tower
@@ -86,13 +86,13 @@ void gotoTower(int opt) {
       Brain.Screen.clearScreen();
       break;
     default: //Reset
-      speedMultiplier = 1;
+      speedMultiplier = .8;
       Brain.Screen.clearScreen(blue);
       //interpolate to not slam intakes into robot body
       while (intakeLift.position(rotationUnits::rev) > .01) {
         intakeLift.spin(directionType::rev,
-                        //40*tanh(4*([pos]-.2))+40
-                        40*tanh(4*(intakeLift.position(rotationUnits::rev)-.2))+40,
+                        //40*tanh(4*([pos]-.4))+40
+                        40*tanh(4*(intakeLift.position(rotationUnits::rev)-.4))+40,
                         velocityUnits::rpm);
         //start to move tray down after intake lift has gone down enough
         if (intakeLift.position(rotationUnits::rev) < 1 && !cubeLift.isSpinning()) {

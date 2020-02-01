@@ -21,7 +21,7 @@ using namespace vex;
 
 // A global instance of competition
 competition Competition;
-double speedMultiplier;
+double speedMultiplier = .8;
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -163,11 +163,11 @@ void usercontrol(void) {
       }
     }
     if (Controller1.ButtonB.pressing()) {
-      putCubeInIntakes(); //Is already non-blocking
+      putCubeInIntakes(); //Is already non-blocking, no need for macro
     }
     
     //Precision placement controls
-    if (Controller1.Axis2.position(percent) != 0) {
+    if (Controller1.Axis2.position() != 0) {
       axis2Reset = true;
       if (Controller1.ButtonL1.pressing() || Controller1.ButtonL2.pressing()) {
         intakeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
@@ -176,7 +176,7 @@ void usercontrol(void) {
         cubeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/8, velocityUnits::rpm);
       }
     }
-    if (axis2Reset && Controller1.Axis2.value() == 0) {
+    else if (axis2Reset) {
       intakeLift.stop();
       cubeLift.stop();
       axis2Reset = false;

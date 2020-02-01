@@ -20,10 +20,16 @@ bool hasInit = false;
 void init() {
   if (!hasInit) {
     Brain.Screen.print("INIT");
+    intake(-100);
     //Put tray a bit forward
-    cubeLift.rotateTo(.6, rotationUnits::rev, false);
+    intakeLift.rotateTo(.35, rotationUnits::rev, false);
+    cubeLift.rotateTo(.6, rotationUnits::rev, true);
     cubeLift.resetRotation();
     ambientLight = (ambientLight + indexer.value(analogUnits::mV)) / 2;
+  
+    gotoTower(2);
+    intake(0);
+    gotoTower(0);
   }
   hasInit = true;
 }
@@ -75,17 +81,17 @@ void blueSide() {
 
 void red4Cube() {
   intake(170);
-  travel(45 * WHEEL_RATIO, 200);
+  travel(45 * WHEEL_RATIO, 400);
   faceAngle(-30, 50);
-  travel(7 * WHEEL_RATIO, 200);
+  travel(7 * WHEEL_RATIO, 400);
   wait(200, timeUnits::msec);
+  travel(-7 * WHEEL_RATIO, 400);
   intake(0);
-  travel(-7 * WHEEL_RATIO, 200);
   wait(100, timeUnits::msec);
   faceAngle(180);
-  travel(25 * WHEEL_RATIO);
-  faceAngle(135);
-  travel(22 * WHEEL_RATIO);
+  travel(35 * WHEEL_RATIO);
+  faceAngle(125);
+  travel(22 * WHEEL_RATIO, 3);
   setLift(1);
   setLift(0);
 }
