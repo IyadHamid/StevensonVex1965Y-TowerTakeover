@@ -32,13 +32,13 @@ void setLift(int opt) {
   intakeLift.stop(brakeType::hold);
   switch(opt) {
     case 1:
+      intakes.spin(directionType::rev, 15, velocityUnits::rpm);
       //Needs interpolation to not launch cubes
       while (cubeLift.position(rotationUnits::rev) < 2.6) {
         cubeLift.spin(directionType::fwd,
                       //40*cos((2*pi/7)*[pos])+40
                       40.0*cos(((2.0*pi)/7)*cubeLift.position(rotationUnits::rev))+40,
                       velocityUnits::rpm);
-        intakes.spin(directionType::rev, 8, velocityUnits::rpm);
       }
       cubeLift.stop(brakeType::hold);
       intakes.stop();
@@ -226,4 +226,9 @@ void putAllCubesAboveLine() {
 void putCubeInIntakes() {
   putAllCubesAboveLine();
   intakes.rotateFor(directionType::rev, .1, rotationUnits::rev, false);
+}
+
+void light() {
+  Brain.ThreeWirePort.A.set(true);
+  asm("");
 }

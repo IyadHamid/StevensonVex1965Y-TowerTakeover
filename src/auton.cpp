@@ -20,38 +20,36 @@ bool hasInit = false;
 void init() {
   if (!hasInit) {
     Brain.Screen.print("INIT");
-    intake(-100);
+    intake(100);
     //Put tray a bit forward
-    intakeLift.rotateTo(.35, rotationUnits::rev, false);
-    cubeLift.rotateTo(.6, rotationUnits::rev, true);
+    cubeLift.rotateTo(.4, rotationUnits::rev, 100, velocityUnits::rpm, true);
     cubeLift.resetRotation();
     ambientLight = (ambientLight + indexer.value(analogUnits::mV)) / 2;
-  
-    gotoTower(2);
-    intake(0);
-    gotoTower(0);
   }
   hasInit = true;
 }
 
 void oneCube() {
-  allDrive.rotateFor(directionType::fwd, 20 * WHEEL_RATIO, rotationUnits::deg);
-  allDrive.rotateFor(directionType::rev, 14 * WHEEL_RATIO, rotationUnits::deg);
+  wait(1, timeUnits::sec);
+  travel(8 * WHEEL_RATIO, 800);
+  intake(-100);
+  wait(2, timeUnits::sec);
+  intake(0);
+  travel(-10 * WHEEL_RATIO, 400);
 }
 
 void blue4Cube() {
-  intake(170);
-  travel(-45 * WHEEL_RATIO, 200);
-  faceAngle(30, 50);
-  travel(7 * WHEEL_RATIO, 200);
+  intake(200);
+  travel(45 * WHEEL_RATIO, 500);
+  //faceAngle(-30, 50);
+  //travel(7 * WHEEL_RATIO, 400);
   wait(200, timeUnits::msec);
+  //travel(-7 * WHEEL_RATIO, 400);
   intake(0);
-  travel(-7 * WHEEL_RATIO, 200);
   wait(100, timeUnits::msec);
-  faceAngle(180);
-  travel(25 * WHEEL_RATIO);
-  faceAngle(-135);
-  travel(22 * WHEEL_RATIO);
+  travel(-35 * WHEEL_RATIO, 700);
+  faceAngle(-125, 70);
+  travel(21 * WHEEL_RATIO);
   setLift(1);
   setLift(0);
 }
@@ -80,17 +78,16 @@ void blueSide() {
 }
 
 void red4Cube() {
-  intake(170);
+    intake(170);
   travel(45 * WHEEL_RATIO, 400);
-  faceAngle(-30, 50);
-  travel(7 * WHEEL_RATIO, 400);
+  //faceAngle(-30, 50);
+  //travel(7 * WHEEL_RATIO, 400);
   wait(200, timeUnits::msec);
-  travel(-7 * WHEEL_RATIO, 400);
+  //travel(-7 * WHEEL_RATIO, 400);
   intake(0);
   wait(100, timeUnits::msec);
-  faceAngle(180);
-  travel(35 * WHEEL_RATIO);
-  faceAngle(125);
+  travel(-35 * WHEEL_RATIO);
+  faceAngle(125, 40);
   travel(22 * WHEEL_RATIO, 3);
   setLift(1);
   setLift(0);

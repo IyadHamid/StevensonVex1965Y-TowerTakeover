@@ -69,7 +69,7 @@ void pre_auton(void) {
 
 void autonomous(void) {
   init();
-  red4Cube();
+  oneCube();
 }
 
 /*---------------------------------------------------------------------------*/
