@@ -7,6 +7,11 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #pragma once
+#include <sstream>
+
+//Value, Delta, Actual
+#define within_tolerance(A,B,C) (C-B <= A && A <= C+B)
+#define task_cast (int(*)())
 
 using namespace std;
 
@@ -17,7 +22,12 @@ const double pi = 3.14159265;
  * @return string from input
  * @param T anything
  */
-template <typename T> string to_string(const T &n);
+template <typename T> string to_string(const T &n) {
+  //avalible in newer versions of c++
+  ostringstream stm;
+  stm << n;
+  return stm.str();
+}
 
 /**
  * @brief Null function

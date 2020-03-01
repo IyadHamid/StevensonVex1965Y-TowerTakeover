@@ -3,8 +3,7 @@ using namespace vex;
 #pragma once
 
 //Motor -> Distance: Gear ratio*Circumference
-#define WHEEL_RATIO 25.8
-//#define WHEEL_RATIO 24.6104
+#define WHEEL_RATIO 21.25
 extern brain Brain;
 
 // VEXcode devices
@@ -27,7 +26,7 @@ extern motor intakeLeft;
 //Right intake motor
 extern motor intakeRight;
 //Tray motor
-extern motor cubeLift;
+extern motor tray;
 //Intake Lift motor
 extern motor intakeLift;
 

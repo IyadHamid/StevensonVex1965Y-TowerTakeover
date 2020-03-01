@@ -13,15 +13,20 @@
 #include "auton.h"
 #include "actions.h"
 #include "common.h"
+#include "reader.h"
 
 //Force running auton after init
-#define FORCE_AUTON 0
+#define FORCE_AUTON 1
+#define READER_MODE 0
 
 using namespace vex;
 
 // A global instance of competition
 competition Competition;
 double speedMultiplier = .8;
+#if READER_MODE
+Reader r = Reader(Brain);
+#endif
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -43,45 +48,31 @@ void pre_auton(void) {
   bottomRight.resetRotation();
   intakeLeft .resetRotation();
   intakeRight.resetRotation();
-  cubeLift   .resetRotation();
+  tray       .resetRotation();
   intakeLift .resetRotation();
 
   intakeLift.stop(brakeType::coast);
   
   //wait until inertial is done calibrating
   //also calibrate indexer
-  while (inert.isCalibrating()) {
+  while (inert.isCalibrating() && inert.installed()) {
     Brain.Screen.clearScreen(white);
     ambientLight = (ambientLight + indexer.value(analogUnits::mV)) / 2;
   }
   Brain.Screen.clearScreen(black);
 }
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              Autonomous Task                              */
-/*                                                                           */
-/*  This task is used to control your robot during the autonomous phase of   */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
-
+/*
+*/
 void autonomous(void) {
-  init();
-  oneCube();
+  //init();
+  //oneCube();
+  //redSide();
+  debug();
 }
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                              User Control Task                            */
-/*                                                                           */
-/*  This task is used to control your robot during the user control phase of */
-/*  a VEX Competition.                                                       */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
-
+/*
+*/
 void usercontrol(void) {
   ControlGui cg = ControlGui({Controller1.Screen, Controller2.Screen});
   NotificationHandler nf = NotificationHandler({Controller1.Screen, Controller2.Screen});
@@ -93,34 +84,35 @@ void usercontrol(void) {
   bool buttonXPressed = false;
   bool axis2Reset = false;
   //Used for multithreading ("blocking" code)
-  thread macroThread = fn_null;
+  task macroTask = task(task_cast fn_null);
   //No need to stress motor
   intakeLift.stop(brakeType::coast);
 
   //Drive controls are for some reason locked
   //gotoTower(0) unlocks it
-  gotoTower(0);
-
+  //////////////////////////////////gotoTower(0);
+  Brain.Screen.print("User has control");
   Controller1.Axis3.changed(doArcade);
   Controller1.Axis4.changed(doArcade);
+  //Check for buttons do not need to be multi-threaded
   while (true) {
     //Initialize incase for skills
     if (Controller1.ButtonY.pressing()) {
-      macroThread.interrupt();
-      macroThread = init;
+      macroTask.stop();
+      macroTask = task(task_cast init);
     }
 
     //Set lift up/down in toggle mode
     if (Controller1.ButtonX.pressing()) {
       if (!buttonXPressed) {
         if (!liftUp) {
-          macroThread.interrupt();
-          macroThread = setLift1;
+          macroTask.stop();
+          macroTask = task(task_cast setLift1);
           liftUp = true;
         }
         else {
-          macroThread.interrupt();
-          macroThread = setLift0;
+          macroTask.stop();
+          macroTask = task(task_cast setLift0);
           liftUp = false;
         }
       }
@@ -132,18 +124,18 @@ void usercontrol(void) {
 
     //goto tower macros
     if (Controller1.ButtonL1.pressing()) {
-      macroThread.interrupt();
-      macroThread = gotoTower2;
+      macroTask.stop();
+      macroTask = task(task_cast gotoTower2);
       tower = 2;
     }
     else if (Controller1.ButtonL2.pressing()) {
-      macroThread.interrupt();
-      macroThread = gotoTower1;
+      macroTask.stop();
+      macroTask = task(task_cast gotoTower1);
       tower = 1;
     }
     else if (tower != 0) {
-      macroThread.interrupt();
-      macroThread = gotoTower0;
+      macroTask.stop();
+      macroTask = task(task_cast gotoTower0);
       tower = 0;
     }
 
@@ -153,7 +145,7 @@ void usercontrol(void) {
       intakeRunning = true;
     }
     else if (Controller1.ButtonR2.pressing()) {
-      intake(-50);
+      intake(-100);
       intakeRunning = true;
     }
     else {
@@ -173,12 +165,12 @@ void usercontrol(void) {
         intakeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/10, velocityUnits::rpm);
       }
       else if (liftUp) {
-        cubeLift.spin(directionType::fwd, Controller1.Axis2.position(percent)/8, velocityUnits::rpm);
+        tray.spin(directionType::fwd, Controller1.Axis2.position(percent)/8, velocityUnits::rpm);
       }
     }
     else if (axis2Reset) {
       intakeLift.stop();
-      cubeLift.stop();
+      tray.stop();
       axis2Reset = false;
     }
 
@@ -199,8 +191,7 @@ void usercontrol(void) {
     if (cg.settings[ControlGui::Unjam] == true) {
       intakeRunning = false;
 
-      macroThread.interrupt();
-      macroThread = fn_null;
+      macroTask.stop();
       
       topLeft    .stop(brakeType::coast);
       bottomLeft .stop(brakeType::coast);
@@ -208,11 +199,19 @@ void usercontrol(void) {
       bottomRight.stop(brakeType::coast);
       intakeLeft .stop(brakeType::coast);
       intakeRight.stop(brakeType::coast);
-      cubeLift   .stop(brakeType::coast);
+      tray   .stop(brakeType::coast);
       intakeLift .stop(brakeType::coast);
 
       cg.setOption(ControlGui::Unjam, false);
     }
+#if READER_MODE
+    if (Brain.Screen.pressing()) {
+      Brain.Screen.clearScreen(white);
+      r.stopRead();
+      wait(1, timeUnits::sec);
+      Brain.Screen.clearScreen(black);
+    }
+#endif
   }
 }
 
@@ -220,22 +219,22 @@ void usercontrol(void) {
 // Main will set up the competition functions and callbacks.
 //
 int main() {
+  // Run the pre-autonomous function.
+  pre_auton();
+
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomous);
   Competition.drivercontrol(usercontrol);
 
-  // Run the pre-autonomous function.
-  pre_auton();
-  
 #if FORCE_AUTON
   autonomous();
+#endif
+#if READER_MODE
+  r.startRead();
 #endif
 
   // Prevent main from exiting with an infinite loop.
   while (true) {
-    //Brain.Screen.printAt(0, 50, "Raw: %f", ultraSonic.distance(distanceUnits::in));
-    //
-    //Brain.Screen.printAt(0, 75, "fn: %f", ultraSonic.distance(distanceUnits::in));
     wait(100, msec); //prevent wastage of resources
   }
 }

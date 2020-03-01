@@ -22,8 +22,8 @@ void init() {
     Brain.Screen.print("INIT");
     intake(100);
     //Put tray a bit forward
-    cubeLift.rotateTo(.4, rotationUnits::rev, 100, velocityUnits::rpm, true);
-    cubeLift.resetRotation();
+    tray.rotateTo(.4, rotationUnits::rev, 100, velocityUnits::rpm, true);
+    tray.resetRotation();
     ambientLight = (ambientLight + indexer.value(analogUnits::mV)) / 2;
   }
   hasInit = true;
@@ -122,7 +122,32 @@ void skills() {
 
 void debug() {
   Brain.Screen.print("DEBUG AUTON");
-  waitUntil(Brain.Screen.pressing());
-  travel(0 * WHEEL_RATIO);
-  Brain.Screen.print("GOODBYE");
+  travelInputs inputs = {0, 500, 2, bottomLeft, allDrive, rotationUnits::deg};
+  task autonTask0, autonTask1;
+  intake(100);
+  allDrive.stop();
+  allDrive.spin(directionType::fwd, 600, velocityUnits::dps);
+  waitUntil(bottomRight.rotation(rotationUnits::deg) >= 18*WHEEL_RATIO);
+  inputs.dist = 20*WHEEL_RATIO;
+  autonTask0 = task(travel, &inputs);
+  waitUntil(bottomRight.rotation(rotationUnits::deg) >= 33*WHEEL_RATIO);
+  gotoTower(3, .25);
+  wait(300, timeUnits::msec);
+  autonTask1 = task(gotoTower0);
+  wait(300, timeUnits::msec);
+  autonTask0.stop();
+  //38"
+  travel(-13*WHEEL_RATIO, 1000);
+  intakes.stop(brakeType::hold);
+  sCurve();
+  wait(80, timeUnits::msec);
+  faceAngle(0, 30);
+  allDrive.spin(directionType::fwd, 600, velocityUnits::dps);
+  intake(100);
+  waitUntil(bottomRight.rotation(rotationUnits::deg) >= 12*WHEEL_RATIO);
+  travel(22 * WHEEL_RATIO);
+  wait(1, timeUnits::sec);
+
+  intake(0);
+Brain.Screen.print("GOODBYE");
 }

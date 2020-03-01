@@ -6,6 +6,7 @@
 /*    Description:  Autonomous function definition                            */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
+#pragma once 
 
 /**
  * @brief Prior to ALL autons

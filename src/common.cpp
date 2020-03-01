@@ -7,17 +7,9 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
-#include <sstream>
 #include "common.h"
 
 using namespace std;
-
-template <typename T> string to_string(const T &n) {
-  //for some reason unavalible in std
-  ostringstream stm;
-  stm << n;
-  return stm.str();
-}
 
 void fn_null() {/*Does nothing*/}
 

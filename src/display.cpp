@@ -23,7 +23,7 @@ void NotificationHandler::startNotifications() {
   string notifications;
   //Array of all the motors
   motor motors[] = {topLeft,  bottomLeft, topRight, bottomRight,
-                    intakeLift, cubeLift, intakeLeft, intakeRight};
+                    intakeLift, tray, intakeLeft, intakeRight};
   for (const string &inf : nfs) {
     if (inf != "")
       notifications += " | " + inf;

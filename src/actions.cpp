@@ -13,18 +13,33 @@
 #include "robot-config.h"
 
 //Put the tray to be perpendicular to the floor
-#define CUBELIFT_UP 2.85
-//Put the tray to the middle
-#define CUBELIFT_MID 1.6
+#define TRAY_UP 3.0
 //Put intake lift to the mid tower
-#define MID_TOWER 1.25
+#define MID_TOWER 1.185
 //Put intake lift to the low tower
-#define LOW_TOWER .95
+#define LOW_TOWER .9
 
 void doArcade() {
   //normal arcade control
   arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
                 Controller1.Axis4.position() * speedMultiplier / 1.2);
+}
+
+void doSpeedArcade() {
+  //normal arcade control
+  arcadeControl(Controller1.Axis3.position(), 
+                Controller1.Axis4.position());
+}
+
+void doTank() {
+  tankControl(Controller1.Axis3.position() * speedMultiplier, 
+              Controller1.Axis2.position() * speedMultiplier);
+}
+
+void doDrone() {
+  //normal arcade control
+  arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
+                Controller1.Axis1.position() * speedMultiplier / 1.2);
 }
 
 void setLift(int opt) {
@@ -34,19 +49,19 @@ void setLift(int opt) {
     case 1:
       intakes.spin(directionType::rev, 15, velocityUnits::rpm);
       //Needs interpolation to not launch cubes
-      while (cubeLift.position(rotationUnits::rev) < 2.6) {
-        cubeLift.spin(directionType::fwd,
+      while (tray.position(rotationUnits::rev) < TRAY_UP) {
+        tray.spin(directionType::fwd,
                       //40*cos((2*pi/7)*[pos])+40
-                      40.0*cos(((2.0*pi)/7)*cubeLift.position(rotationUnits::rev))+40,
+                      40.0*cos(((2.0*pi)/7)*tray.position(rotationUnits::rev))+40,
                       velocityUnits::rpm);
       }
-      cubeLift.stop(brakeType::hold);
+      tray.stop(brakeType::hold);
       intakes.stop();
       break;
     default:
       //Put the cube lift down and back off
       intakes.spin(directionType::rev, 80, velocityUnits::rpm);
-      cubeLift.rotateTo(0, rotationUnits::rev, 70, velocityUnits::rpm, false);
+      tray.rotateTo(0, rotationUnits::rev, 70, velocityUnits::rpm, false);
       allDrive.rotateFor(directionType::rev, 7 * WHEEL_RATIO, rotationUnits::deg, 80, velocityUnits::rpm);
       intakes.stop();
       break;
@@ -62,30 +77,24 @@ void setLift0() {
   setLift(0);
 }
 
-void gotoTower(int opt) {
+void gotoTower(int opt, double custom) {
   switch (opt) {
     case 1: //Low
       //Lower the speed
       speedMultiplier = .3;
       Brain.Screen.clearScreen(red);
-      //Move tray out of the way
-      cubeLift.rotateTo(CUBELIFT_MID, rotationUnits::rev, 100, velocityUnits::pct, false);
-      this_thread::sleep_for(1); //Sleep for 1 tick
-      intakeLift.rotateTo(LOW_TOWER, rotationUnits::rev, 50, velocityUnits::rpm, true);
+      intakeLift.rotateTo(LOW_TOWER, rotationUnits::rev, 100, velocityUnits::rpm, true);
       intakeLift.stop(brakeType::hold);
       Brain.Screen.clearScreen();
       break;
     case 2: //Mid
       speedMultiplier = .3;
       Brain.Screen.clearScreen(green);
-      //Move tray out of the way
-      cubeLift.rotateTo(CUBELIFT_MID, rotationUnits::rev, 100, velocityUnits::pct, false);
-      this_thread::sleep_for(1); //Sleep for 1 tick
-      intakeLift.rotateTo(MID_TOWER, rotationUnits::rev, 50, velocityUnits::rpm, true);
+      intakeLift.rotateTo(MID_TOWER, rotationUnits::rev, 100, velocityUnits::rpm, true);
       intakeLift.stop(brakeType::hold);
       Brain.Screen.clearScreen();
       break;
-    default: //Reset
+    case 0: //Reset
       speedMultiplier = .8;
       Brain.Screen.clearScreen(blue);
       //interpolate to not slam intakes into robot body
@@ -94,43 +103,61 @@ void gotoTower(int opt) {
                         //40*tanh(4*([pos]-.4))+40
                         40*tanh(4*(intakeLift.position(rotationUnits::rev)-.4))+40,
                         velocityUnits::rpm);
-        //start to move tray down after intake lift has gone down enough
-        if (intakeLift.position(rotationUnits::rev) < 1 && !cubeLift.isSpinning()) {
-          cubeLift.rotateTo(0, rotationUnits::rev);     
-        }
       }
       intakeLift.stop(brakeType::coast);
-      cubeLift.rotateTo(0, rotationUnits::rev);
       Brain.Screen.clearScreen();
       break;
+    case 3:
+      intakeLift.rotateTo(custom, rotationUnits::rev, 100, velocityUnits::rpm, true);
+      intakeLift.stop(brakeType::hold);
   }
 }
 
-void gotoTower2() {
+int gotoTower2() {
   gotoTower(2);
+  return 0;
 }
 
-void gotoTower1() {
+int gotoTower1() {
   gotoTower(1);
+  return 0;
 }
 
-void gotoTower0() {
+int gotoTower0() {
   gotoTower(0);
+  return 0;
 }
 
-void intake(int vel) {
+void intake(double vel, velocityUnits units) {
   if (vel == 0) {
     intakes.stop(brakeType::hold);
   } 
   else {
     //Make the treads of the intakes to match
     if (intakeLeft.position(rotationUnits::deg) < intakeRight.position(rotationUnits::deg)) {
-      intakeLeft.spin(directionType::fwd, vel, velocityUnits::pct);
-      intakeRight.spin(directionType::fwd, vel - 10, velocityUnits::pct);
+      intakeLeft.spin(directionType::fwd, vel, units);
+      intakeRight.spin(directionType::fwd, vel - 10, units);
     }
     else {
-      intakeLeft.spin(directionType::fwd, vel - 10, velocityUnits::pct);
-      intakeRight.spin(directionType::fwd, vel, velocityUnits::pct);
+      intakeLeft.spin(directionType::fwd, vel - 10, units);
+      intakeRight.spin(directionType::fwd, vel, units);
+    }
+  }
+}
+
+void intake(double vel, voltageUnits units) {
+  if (vel == 0) {
+    intakes.stop(brakeType::hold);
+  } 
+  else {
+    //Make the treads of the intakes to match
+    if (intakeLeft.position(rotationUnits::deg) < intakeRight.position(rotationUnits::deg)) {
+      intakeLeft.spin(directionType::fwd, vel, units);
+      intakeRight.spin(directionType::fwd, vel - 10, units);
+    }
+    else {
+      intakeLeft.spin(directionType::fwd, vel - 10, units);
+      intakeRight.spin(directionType::fwd, vel, units);
     }
   }
 }
@@ -139,9 +166,9 @@ void stopIntake() {
   intake(0);
 }
 
-void travel(double amount, double vel, double precision, rotationUnits rotUnits) {
+void travel(double amount, double vel, double precision, motor encoderMotor, motor_group driveGroup, rotationUnits rotUnits, bool verbose) {
   //Function is relative
-  bottomLeft.resetRotation();
+  encoderMotor.resetRotation();
 
   //Convert to revolutions
   if (rotUnits == rotationUnits::rev) {
@@ -150,13 +177,17 @@ void travel(double amount, double vel, double precision, rotationUnits rotUnits)
   }
 
   //Until within range of precision
-  while (!(bottomLeft.rotation(rotationUnits::deg) < amount + precision &&
-           bottomLeft.rotation(rotationUnits::deg) > amount - precision)) {
-    Brain.Screen.printAt(0,75,"amt:%lf   encoder:%lf        ", amount, bottomLeft.rotation(rotationUnits::rev));
-    Brain.Screen.printAt(0,200,"%lf  %lf", amount - precision, amount + precision);    
+  while (!(encoderMotor.rotation(rotationUnits::deg) < amount + precision &&
+           encoderMotor.rotation(rotationUnits::deg) > amount - precision)) {
+    if (verbose) {
+      Brain.Screen.printAt(0,75,"amt:%lf   encoder:%lf        ", amount, encoderMotor.rotation(rotationUnits::rev));
+      Brain.Screen.printAt(0,200,"%lf  %lf", amount - precision, amount + precision);    
+    }
     //fn = displacement (revolutions) to target
-    double fn = amount - bottomLeft.rotation(rotationUnits::deg);
-    Brain.Screen.printAt(0,100,"Dist to move: %lf       ", fn);
+    double fn = amount - encoderMotor.rotation(rotationUnits::deg);
+    if (verbose) {
+      Brain.Screen.printAt(0,100,"Dist to move: %lf       ", fn);
+    }
     //fn can be represented as a piecewise function:
     //      / .001(x^2) + 100, x >= 0
     //fn = {
@@ -166,13 +197,62 @@ void travel(double amount, double vel, double precision, rotationUnits rotUnits)
     //fn = vel * tanh((|x|/x) * (.00001(x^2) + .15))
     fn = vel * tanh(fn);
     //fn is used to interpolate the velocoity of the robot in rpm (for motors)
-    Brain.Screen.printAt(0,125,"dps: %lf       ", fn);
-    allDrive.spin(directionType::fwd, fn, velocityUnits::dps);
+    if (verbose) {
+      Brain.Screen.printAt(0,125,"dps: %lf       ", fn);
+    }
+    driveGroup.spin(directionType::fwd, fn, velocityUnits::dps);
   }
-  allDrive.stop(brakeType::brake);
+  driveGroup.stop(brakeType::brake);
 }
 
-void faceAngle(double deg, double vel, double precision) {
+int travel(void * inputs) {
+  convertTravelInputs cti;
+  cti.voidptr = inputs;
+  travel(cti.inputptr->dist, cti.inputptr->vel, cti.inputptr->precision, cti.inputptr->encoderMotor, cti.inputptr->motorGroup, cti.inputptr->rUnits, false);
+  return 0;
+}
+
+void sCurve() {
+  const double vel = 100;
+  const double curve = 1.9;
+  const double dist = 1.145;
+  const bool verbose = false;
+
+  bottomLeft.resetRotation();
+  double rot = bottomLeft.rotation(rotationUnits::rev);
+  double fn;
+  double deg = inert.heading();
+  double precision = 10;
+  const int pR = (int)(deg + precision) % 360; //Right boundy
+  const int pL = (int)(deg + 360 - ((int)precision % 360)) % 360; //Left boundry
+
+  while (!(rot <= -.5 &&
+            ((pL < deg && deg < pR) ||
+             (deg < pR && pR < pL) ||
+             (pR < pL && pL < deg)))) {
+               
+    deg = inert.heading();
+    fn = -vel * tanh(curve * (-rot - dist)) + vel + 5;
+    fn *= -1;
+    if (verbose) {
+      Brain.Screen.printAt(0, 50, "Rot: %f Deg: %f    ", rot, deg);
+      Brain.Screen.printAt(0, 75, "left rpm: %f     ", fn);
+    }
+    leftDrive.spin(directionType::fwd, fn, velocityUnits::rpm);
+    //Flip for other side f(-x + 2)
+    fn = -vel * tanh(curve * ((rot + dist * 2) - dist)) + vel + 5;
+    fn *= -1;
+    if (verbose) {
+      Brain.Screen.printAt(0, 100, "right rpm: %f     ", fn);
+    }
+    rightDrive.spin(directionType::fwd, fn, velocityUnits::rpm);
+    rot = bottomLeft.rotation(rotationUnits::rev);
+  }
+  allDrive.stop();
+  faceAngle(0, 40);
+}
+
+void faceAngle(double deg, double vel, double precision, bool verbose) {
   //Get heading within [0,360)
   double dir = (int)round(inert.heading()) % 360; //Direction heading integer
   double fn;                                      //Math function
@@ -183,20 +263,24 @@ void faceAngle(double deg, double vel, double precision) {
   deg = (int)round(deg + 360) % 360;
   //precision
   const int pR = (int)(deg + precision) % 360; //Right boundy
-  const int pL = (int)(deg + 360 - ((int)precision % 360)) % 360; //Right boundry
+  const int pL = (int)(deg + 360 - ((int)precision % 360)) % 360; //Left boundry
 
   //Until within range of precision (in a circle [0,360))
   while (!((pL < dir && dir < pR) ||
           (dir < pR && pR < pL) ||
           (pR < pL && pL < dir))) {
     dir = (int)round(inert.heading()) % 360;
-    Brain.Screen.printAt(0,75,"deg:%lf   heading:%lf          ", deg, inert.heading());
-    Brain.Screen.printAt(0,100,"dir:%lf          ", dir);
+    if (verbose) {
+      Brain.Screen.printAt(0,75,"deg:%lf   heading:%lf          ", deg, inert.heading());
+      Brain.Screen.printAt(0,100,"dir:%lf          ", dir);
+    }
     l = (int)round((360+deg) - dir) % 360; //Left rotation
     r = (int)round((360+dir) - deg) % 360; //Right rotation
     //fn = angular displacement (degree) from target degree
     fn = r > l ? l : -r;
-    Brain.Screen.printAt(0,125,"Angle to rot: %lf       ", fn);
+    if (verbose) {
+      Brain.Screen.printAt(0,125,"Angle to rot: %lf       ", fn);
+    }
     //fn can be represented as a piecewise function:
     //      / .001(x^2) + 100, x >= 0
     //fn = {
@@ -206,7 +290,9 @@ void faceAngle(double deg, double vel, double precision) {
     //fn = vel * tanh((|x|/x) * .001((x^2) + 100))
     fn = vel * tanh(fn);
     //fn is used to interpolate the angular velocity of the robot rotating in rpm (for motors)
-    Brain.Screen.printAt(0,150,"rpm on left: %lf", fn);
+    if (verbose) {
+      Brain.Screen.printAt(0,150,"rpm on left: %lf", fn);
+    }
     leftDrive.spin(directionType::fwd, fn, velocityUnits::rpm);
     rightDrive.spin(directionType::rev, fn, velocityUnits::rpm);
   }

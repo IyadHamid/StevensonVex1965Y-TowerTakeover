@@ -6,7 +6,6 @@
 /*    Description:  Default header for V5 projects                            */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-//
 #pragma once
 
 #include <stdio.h>
