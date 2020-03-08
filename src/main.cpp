@@ -16,14 +16,14 @@
 #include "reader.h"
 
 //Force running auton after init
-#define FORCE_AUTON 1
+#define FORCE_AUTON 0
 #define READER_MODE 0
 
 using namespace vex;
 
 // A global instance of competition
 competition Competition;
-double speedMultiplier = .8;
+double speedMultiplier = DEFAULT_SPEED_MULTIPLIER;
 #if READER_MODE
 Reader r = Reader(Brain);
 #endif
@@ -88,9 +88,6 @@ void usercontrol(void) {
   //No need to stress motor
   intakeLift.stop(brakeType::coast);
 
-  //Drive controls are for some reason locked
-  //gotoTower(0) unlocks it
-  //////////////////////////////////gotoTower(0);
   Brain.Screen.print("User has control");
   Controller1.Axis3.changed(doArcade);
   Controller1.Axis4.changed(doArcade);
@@ -107,12 +104,12 @@ void usercontrol(void) {
       if (!buttonXPressed) {
         if (!liftUp) {
           macroTask.stop();
-          macroTask = task(task_cast setLift1);
+          macroTask = task(setLift1);
           liftUp = true;
         }
         else {
           macroTask.stop();
-          macroTask = task(task_cast setLift0);
+          macroTask = task(setLift0);
           liftUp = false;
         }
       }
@@ -199,7 +196,7 @@ void usercontrol(void) {
       bottomRight.stop(brakeType::coast);
       intakeLeft .stop(brakeType::coast);
       intakeRight.stop(brakeType::coast);
-      tray   .stop(brakeType::coast);
+      tray       .stop(brakeType::coast);
       intakeLift .stop(brakeType::coast);
 
       cg.setOption(ControlGui::Unjam, false);

@@ -3,7 +3,8 @@ using namespace vex;
 #pragma once
 
 //Motor -> Distance: Gear ratio*Circumference
-#define WHEEL_RATIO 21.25
+#define WHEEL_RATIO 21.23
+#define DEFAULT_SPEED_MULTIPLIER .85
 extern brain Brain;
 
 // VEXcode devices

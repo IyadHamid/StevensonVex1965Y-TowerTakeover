@@ -38,12 +38,12 @@ void setLift(int);
 /**
  * @brief redirect to setLift with input of 1
  */
-void setLift1();
+int setLift1();
 
 /**
  * @brief redirect to setLift with input of 0
  */
-void setLift0();
+int setLift0();
 
 /**
  * @brief set intake lift to a tower 
@@ -105,7 +105,31 @@ struct travelInputs {
   rotationUnits rUnits;
 };
 
-void sCurve();
+/**
+ * @brief s-curve
+ * @param double velocity (dps)
+ * @param double distance (not actual)
+ * @param double curve
+ * @param motor_group turn to side
+ * @param motor_group outer side
+ * @param motor encoder motor
+ * @param bool verbose (set to false)
+*/
+void sCurve(double, double, double, motor_group, motor_group, motor, bool = false);
+
+/**
+ * @brief j-curve
+ * @param double velocity (dps)
+ * @param double angle to go to
+ * @param double curve
+ * @param double distance (not actual)
+ * @param offset rotations
+ * @param motor_group inside motors
+ * @param motor_group outside motors
+ * @param double precision
+ * @param bool verbose (set to false)
+*/
+void jCurve(double, double, double, double, double, motor_group, motor_group, double, bool = false);
 
 union convertTravelInputs {
   travelInputs * inputptr;
@@ -125,7 +149,7 @@ int travel(void *);
  * @param double percesion (set to 1)
  * @param bool verbose (set to true)
 */
-void faceAngle(double, double = 60, double = 1, bool = true);
+void faceAngle(double, double = 50, double = 1, bool = false);
 
 /**
  * @brief Puts cubes above the line sensor

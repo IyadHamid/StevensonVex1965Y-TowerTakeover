@@ -122,32 +122,54 @@ void skills() {
 
 void debug() {
   Brain.Screen.print("DEBUG AUTON");
-  travelInputs inputs = {0, 500, 2, bottomLeft, allDrive, rotationUnits::deg};
+  travelInputs inputs = {0, 900, 2, bottomLeft, allDrive, rotationUnits::deg};
   task autonTask0, autonTask1;
   intake(100);
   allDrive.stop();
-  allDrive.spin(directionType::fwd, 600, velocityUnits::dps);
-  waitUntil(bottomRight.rotation(rotationUnits::deg) >= 18*WHEEL_RATIO);
-  inputs.dist = 20*WHEEL_RATIO;
+  allDrive.resetRotation();
+  allDrive.spin(directionType::fwd, 1050, velocityUnits::dps);
+  waitUntil(bottomRight.rotation(rotationUnits::deg) >= 13*WHEEL_RATIO);
+  allDrive.stop(brakeType::coast);
+  inputs.dist = 27*WHEEL_RATIO;
   autonTask0 = task(travel, &inputs);
-  waitUntil(bottomRight.rotation(rotationUnits::deg) >= 33*WHEEL_RATIO);
+  inputs.vel = 700;
+  waitUntil(bottomLeft.rotation(rotationUnits::deg) >= 19.25*WHEEL_RATIO);
   gotoTower(3, .25);
   wait(300, timeUnits::msec);
   autonTask1 = task(gotoTower0);
   wait(300, timeUnits::msec);
   autonTask0.stop();
-  //38"
-  travel(-13*WHEEL_RATIO, 1000);
-  intakes.stop(brakeType::hold);
-  sCurve();
+  allDrive.stop();
+
+  intakes.stop(brakeType::brake);
+  sCurve(130, 1.41, .7, rightDrive, leftDrive, bottomLeft);
   wait(80, timeUnits::msec);
-  faceAngle(0, 30);
-  allDrive.spin(directionType::fwd, 600, velocityUnits::dps);
+  faceAngle(0, 100);
+  wait(50, timeUnits::msec);
+
+  wait(50, timeUnits::msec);
+  intakes.stop(brakeType::coast);
+  allDrive.spin(directionType::fwd, 800, velocityUnits::dps);
   intake(100);
   waitUntil(bottomRight.rotation(rotationUnits::deg) >= 12*WHEEL_RATIO);
-  travel(22 * WHEEL_RATIO);
-  wait(1, timeUnits::sec);
+  travel(22 * WHEEL_RATIO, 700);
 
   intake(0);
-Brain.Screen.print("GOODBYE");
+  jCurve(600, 130, 2, 1, 2.2, leftDrive, rightDrive, 2);
+  wait(80, timeUnits::msec);
+  faceAngle(135, 60);
+  wait(50, timeUnits::msec);
+
+  bottomLeft.resetRotation();
+  allDrive.spin(directionType::fwd, 450, velocityUnits::dps);
+  waitUntil(bottomLeft.rotation(rotationUnits::deg) >= 9.5 * WHEEL_RATIO);
+  intakes.stop(brakeType::coast);
+  allDrive.stop(brakeType::coast);
+  wait(120, timeUnits::msec);
+  setLift1();
+  setLift0();
+
+  autonTask0.stop();
+  autonTask1.stop();
+  Brain.Screen.print("GOODBYE");
 }

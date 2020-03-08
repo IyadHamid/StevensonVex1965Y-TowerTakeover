@@ -13,16 +13,16 @@
 #include "robot-config.h"
 
 //Put the tray to be perpendicular to the floor
-#define TRAY_UP 3.0
+#define TRAY_UP 1.7
 //Put intake lift to the mid tower
-#define MID_TOWER 1.185
+#define MID_TOWER 1.85
 //Put intake lift to the low tower
 #define LOW_TOWER .9
 
 void doArcade() {
   //normal arcade control
   arcadeControl(Controller1.Axis3.position() * speedMultiplier, 
-                Controller1.Axis4.position() * speedMultiplier / 1.2);
+                Controller1.Axis4.position() * speedMultiplier / 2);
 }
 
 void doSpeedArcade() {
@@ -52,7 +52,7 @@ void setLift(int opt) {
       while (tray.position(rotationUnits::rev) < TRAY_UP) {
         tray.spin(directionType::fwd,
                       //40*cos((2*pi/7)*[pos])+40
-                      40.0*cos(((2.0*pi)/7)*tray.position(rotationUnits::rev))+40,
+                      60.0*cos(((2.0*pi)/7)*tray.position(rotationUnits::rev))+60.0,
                       velocityUnits::rpm);
       }
       tray.stop(brakeType::hold);
@@ -68,13 +68,15 @@ void setLift(int opt) {
   }
 }
 
-void setLift1() {
+int setLift1() {
   setLift(1);
+  return 0;
 }
 
 
-void setLift0() {
+int setLift0() {
   setLift(0);
+  return 0;
 }
 
 void gotoTower(int opt, double custom) {
@@ -95,13 +97,13 @@ void gotoTower(int opt, double custom) {
       Brain.Screen.clearScreen();
       break;
     case 0: //Reset
-      speedMultiplier = .8;
+      speedMultiplier = DEFAULT_SPEED_MULTIPLIER;
       Brain.Screen.clearScreen(blue);
       //interpolate to not slam intakes into robot body
       while (intakeLift.position(rotationUnits::rev) > .01) {
         intakeLift.spin(directionType::rev,
-                        //40*tanh(4*([pos]-.4))+40
-                        40*tanh(4*(intakeLift.position(rotationUnits::rev)-.4))+40,
+                        //40*tanh(8*([pos]-.3))+40
+                        40*tanh(12*(intakeLift.position(rotationUnits::rev)-.1))+40,
                         velocityUnits::rpm);
       }
       intakeLift.stop(brakeType::coast);
@@ -212,21 +214,17 @@ int travel(void * inputs) {
   return 0;
 }
 
-void sCurve() {
-  const double vel = 100;
-  const double curve = 1.9;
-  const double dist = 1.145;
-  const bool verbose = false;
+void sCurve(double vel, double dist, double curve, motor_group side, motor_group other, motor encoderMotor, bool verbose) {
 
-  bottomLeft.resetRotation();
-  double rot = bottomLeft.rotation(rotationUnits::rev);
+  encoderMotor.resetRotation();
+  double rot = encoderMotor.rotation(rotationUnits::rev);
   double fn;
   double deg = inert.heading();
-  double precision = 10;
-  const int pR = (int)(deg + precision) % 360; //Right boundy
+  double precision =  15;
+  const int pR = (int)(deg + precision) % 360; //Right boundry
   const int pL = (int)(deg + 360 - ((int)precision % 360)) % 360; //Left boundry
 
-  while (!(rot <= -.5 &&
+  while (!(rot <= -1 &&
             ((pL < deg && deg < pR) ||
              (deg < pR && pR < pL) ||
              (pR < pL && pL < deg)))) {
@@ -238,18 +236,47 @@ void sCurve() {
       Brain.Screen.printAt(0, 50, "Rot: %f Deg: %f    ", rot, deg);
       Brain.Screen.printAt(0, 75, "left rpm: %f     ", fn);
     }
-    leftDrive.spin(directionType::fwd, fn, velocityUnits::rpm);
+    other.spin(directionType::fwd, fn, velocityUnits::rpm);
     //Flip for other side f(-x + 2)
     fn = -vel * tanh(curve * ((rot + dist * 2) - dist)) + vel + 5;
     fn *= -1;
     if (verbose) {
       Brain.Screen.printAt(0, 100, "right rpm: %f     ", fn);
     }
-    rightDrive.spin(directionType::fwd, fn, velocityUnits::rpm);
-    rot = bottomLeft.rotation(rotationUnits::rev);
+    side.spin(directionType::fwd, fn, velocityUnits::rpm);
+    rot = encoderMotor.rotation(rotationUnits::rev);
+  }
+  allDrive.stop(brakeType::brake);
+  faceAngle(0, vel);
+}
+
+void jCurve(double vel, double ang, double curve, double dist, double offset, motor_group inside, motor_group outside, double precision, bool verbose) {
+  bottomLeft.resetRotation();
+  bottomRight.resetPosition();
+  double rot = bottomLeft.rotation(rotationUnits::rev) + bottomRight.rotation(rotationUnits::rev);
+  double fn;
+  double deg = inert.heading();
+  const int pR = (int)(ang + precision * 2) % 360; //Right boundry
+  const int pL = (int)(ang + 360 - ((int)precision * 2 % 360)) % 360; //Left boundry
+
+  while (!((pL < deg && deg < pR) ||
+           (deg < pR && pR < pL) ||
+           (pR < pL && pL < deg))) {
+    rot = bottomLeft.rotation(rotationUnits::rev) + bottomRight.rotation(rotationUnits::rev);
+    deg = inert.heading();
+    fn = -vel * tanh(curve * (offset + rot));
+    if (verbose) {
+      Brain.Screen.printAt(0, 50, "Rot: %f", rot);
+      Brain.Screen.printAt(0, 75, "Left dps: %f", fn);
+      Brain.Screen.printAt(0, 100, "Deg: %f", deg);
+    }
+    inside.spin(directionType::fwd, fn, velocityUnits::dps);
+    fn = -vel * tanh(curve * (offset + rot + dist));
+    outside.spin(directionType::fwd, fn, velocityUnits::dps);
+
   }
   allDrive.stop();
-  faceAngle(0, 40);
+  faceAngle(ang, 50, precision);
 }
 
 void faceAngle(double deg, double vel, double precision, bool verbose) {
@@ -282,13 +309,14 @@ void faceAngle(double deg, double vel, double precision, bool verbose) {
       Brain.Screen.printAt(0,125,"Angle to rot: %lf       ", fn);
     }
     //fn can be represented as a piecewise function:
-    //      / .001(x^2) + 100, x >= 0
+    //      / .001(x^2) + 300, x >= 0
     //fn = {
-    //      \ -.001(x^2) + 100, x < 0
-    fn = (fn < 0 ? -1 : 1)* .001 * (pow(fn, 2) + 100);
+    //      \ -.001(x^2) + 300, x < 0
+    fn = (.0001 * fn * fn);
     //wrap fn in tanh (makes it into a modified sigmoid function)
-    //fn = vel * tanh((|x|/x) * .001((x^2) + 100))
-    fn = vel * tanh(fn);
+    //fn = vel * tanh((|x|/x) * .001((x^2) + 300))
+    
+    fn = (r < l ? -1 : 1) * ((vel * tanh(fn)) + 5);
     //fn is used to interpolate the angular velocity of the robot rotating in rpm (for motors)
     if (verbose) {
       Brain.Screen.printAt(0,150,"rpm on left: %lf", fn);
